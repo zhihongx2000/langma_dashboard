@@ -1,0 +1,43 @@
+app:
+  name: Lang Ma Dashboard API
+  api_prefix: /api/v1
+
+database:
+  sqlite_path: data/lang_ma_dashboard.db
+
+persona_analysis:
+  model_options:
+    - provider_key: openai_compatible
+      provider_label: OpenAI Compatible
+      model_key: deepseek-chat
+      api_model_name: deepseek-chat
+      model_label: DeepSeek Chat
+      is_default: true
+      is_enabled: true
+      temperature: 0.2
+      max_tokens: 4000
+    - provider_key: openai_compatible
+      provider_label: OpenAI Compatible
+      model_key: deepseek-reasoner
+      api_model_name: deepseek-reasoner
+      model_label: DeepSeek Reasoner
+      is_default: false
+      is_enabled: true
+      temperature: 0.2
+      max_tokens: 4000
+  prompts:
+    - module_key: user_profile_and_reply
+      tool_key: user_profiling_analysis
+      task_key: user_profile_and_reply
+      default_version_label: v1
+      default_prompt_path: prompts/user_profiling_analysis/user_profile_and_reply/v1.md
+    - module_key: risk_detection
+      tool_key: user_profiling_analysis
+      task_key: risk_detection
+      default_version_label: v1
+      default_prompt_path: prompts/user_profiling_analysis/risk_detection/v1.md
+    - module_key: funnel_nodes
+      tool_key: user_profiling_analysis
+      task_key: funnel_nodes
+      default_version_label: v1
+      default_prompt_path: prompts/user_profiling_analysis/funnel_nodes/v1.md
