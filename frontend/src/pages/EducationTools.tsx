@@ -74,6 +74,15 @@ export default function EducationTools() {
               <p className="text-on-secondary-container leading-relaxed max-w-3xl">
                 全网实时抓取各地考试院动态，自动分类整理政策变动、报名时间及考位余额提醒。结合地理位置推送，确保不遗漏任何关键节点。
               </p>
+              <button
+                onClick={() => {
+                  window.location.href = "http://127.0.0.1:8000/test-ui";
+                }}
+                className="mt-8 flex items-center gap-2 px-8 py-3.5 bg-primary text-on-primary rounded-xl font-bold text-sm hover:opacity-90 transition-opacity active:scale-95"
+              >
+                立即开始分析
+                <ArrowRight size={16} />
+              </button>
             </div>
             <div className="p-4 bg-surface-container-highest/30 rounded-2xl text-on-secondary-container group-hover:text-primary transition-colors">
               <Globe size={40} strokeWidth={1.5} />

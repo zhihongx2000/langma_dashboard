@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Crawler Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --color-primary: #00342b;
+      --color-primary-container: #004d40;
+      --color-on-primary: #ffffff;
+      --color-on-secondary-container: #55656d;
+      --color-surface: #f9f9f9;
+      --color-surface-container-lowest: #ffffff;
+      --color-surface-container-low: #f3f3f3;
+      --color-on-surface: #1a1c1c;
+      --color-on-surface-variant: #3f4945;
+      --color-outline-variant: #bfc9c4;
+      --border-subtle: rgba(191, 201, 196, 0.35);
+      --border-hairline: rgba(191, 201, 196, 0.12);
+      --accent-soft: rgba(0, 52, 43, 0.06);
+    }
+    * { box-sizing: border-box; }
+    ::selection { background: rgba(0, 52, 43, 0.2); }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      color: var(--color-on-surface);
+      background: var(--color-surface);
+      padding-bottom: 52px;
+    }
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.15;
+      background-image: radial-gradient(circle, var(--color-outline-variant) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .grain-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    }
+    .app-shell { position: relative; z-index: 20; }
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border-hairline);
+      background: rgba(243, 243, 243, 0.82);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      max-width: 1920px;
+      margin: 0 auto;
+    }
+    .top-nav h1 {
+      margin: 0;
+      font-family: Manrope, Inter, sans-serif;
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--color-primary);
+      letter-spacing: -0.02em;
+    }
+    .top-nav .tagline {
+      font-size: 13px;
+      color: var(--color-primary-container);
+      opacity: 0.7;
+      font-weight: 500;
+    }
+    .wrap {
+      display: grid;
+      grid-template-columns: 44% 56%;
+      gap: 16px;
+      min-height: calc(100vh - 120px);
+      padding: 24px;
+      max-width: 1920px;
+      margin: 0 auto;
+    }
+    .panel {
+      background: var(--color-surface-container-lowest);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+    }
+    .head {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-hairline);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .head h2 {
+      margin: 0;
+      font-size: 15px;
+      font-family: Manrope, Inter, sans-serif;
+      font-weight: 700;
+      color: var(--color-primary);
+      letter-spacing: -0.02em;
+    }
+    .body { padding: 14px 16px; overflow: auto; flex: 1; }
+    .col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; height: 100%; min-height: 280px; }
+    .list {
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      overflow: auto;
+      min-height: 240px;
+      background: var(--color-surface-container-lowest);
+    }
+    .list::-webkit-scrollbar { width: 6px; }
+    .list::-webkit-scrollbar-thumb {
+      background: var(--color-outline-variant);
+      border-radius: 10px;
+    }
+    .item {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-hairline);
+      cursor: pointer;
+      font-size: 13px;
+      transition: background 0.15s ease;
+    }
+    .item:hover, .item.active { background: var(--accent-soft); }
+    .content-card {
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      background: var(--color-surface-container-lowest);
+    }
+    .title { font-weight: 600; font-size: 14px; margin-bottom: 6px; color: var(--color-on-surface); }
+    .meta { font-size: 12px; color: var(--color-on-secondary-container); margin-bottom: 6px; }
+    .tools { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    button, input {
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 8px 12px;
+      font-size: 13px;
+      background: var(--color-surface-container-lowest);
+      color: var(--color-on-surface);
+    }
+    button { cursor: pointer; font-weight: 500; }
+    button.primary {
+      background: var(--color-primary);
+      color: var(--color-on-primary);
+      border-color: var(--color-primary);
+      font-weight: 700;
+    }
+    .search-row { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+    .search-row input { flex: 1; min-width: 140px; }
+    .tag {
+      display: inline-block;
+      border: 1px solid var(--border-hairline);
+      border-radius: 999px;
+      padding: 4px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-on-surface-variant);
+      background: var(--color-surface-container-low);
+    }
+    pre {
+      white-space: pre-wrap;
+      font-size: 12px;
+      color: var(--color-on-surface-variant);
+      background: var(--color-surface-container-low);
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border-subtle);
+    }
+    .body h3 {
+      font-family: Manrope, Inter, sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--color-primary);
+      margin: 16px 0 8px;
+    }
+    .site-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 40;
+      background: rgba(238, 238, 238, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border-subtle);
+      padding: 12px 24px;
+      font-size: 12px;
+      color: var(--color-on-secondary-container);
+      box-sizing: border-box;
+    }
+    .site-footer-inner {
+      max-width: 1920px;
+      margin: 0 auto;
+      opacity: 0.88;
+      letter-spacing: 0.03em;
+    }
+    @media (max-width: 1000px) {
+      .wrap { grid-template-columns: 1fr; min-height: auto; }
+      .col { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-bg" aria-hidden="true"></div>
+  <div class="grain-overlay" aria-hidden="true"></div>
+  <div class="app-shell">
+    <header class="top-nav">
+      <h1>朗玛峰 AI 工作台</h1>
+      <span class="tagline">Crawler dashboard · local</span>
+    </header>
+    <div class="wrap">
+    <section class="panel">
+      <div class="head">
+        <h2>Province / Section / Content</h2>
+        <span class="tag" id="statusText">Ready</span>
+      </div>
+      <div class="body col">
+        <div class="list" id="provinceList"></div>
+        <div class="list" id="sectionList"></div>
+        <div class="list" id="contentList"></div>
+      </div>
+    </section>
+    <section class="panel">
+      <div class="head">
+        <h2>Search and Refresh</h2>
+        <div class="tools">
+          <button id="refreshBtn" class="primary">Refresh All</button>
+          <button id="reportBtn">Latest Report</button>
+        </div>
+      </div>
+      <div class="body">
+        <div class="search-row">
+          <input id="searchInput" placeholder="Enter keyword..." />
+          <button id="keywordSearchBtn">Keyword Search</button>
+          <button id="aiSearchBtn" class="primary">AI Search</button>
+        </div>
+        <div id="searchMeta" class="meta"></div>
+        <div id="searchResult"></div>
+        <h3>Update Report</h3>
+        <pre id="reportBox">Click "Latest Report" to load update details.</pre>
+      </div>
+    </section>
+    </div>
+  </div>
+  <footer class="site-footer">
+    <div class="site-footer-inner">结果仅供老师参考，需人工判断</div>
+  </footer>
+  <script>
+    const provinceList = document.getElementById("provinceList");
+    const sectionList = document.getElementById("sectionList");
+    const contentList = document.getElementById("contentList");
+    const statusText = document.getElementById("statusText");
+    const searchInput = document.getElementById("searchInput");
+    const searchResult = document.getElementById("searchResult");
+    const searchMeta = document.getElementById("searchMeta");
+    const reportBox = document.getElementById("reportBox");
+    let selectedProvinceId = null;
+
+    function setStatus(text) { statusText.textContent = text; }
+    async function jget(url, headers = {}) {
+      const r = await fetch(url, { headers });
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    }
+    function renderList(el, rows, clickFn, key = "id", label = "name") {
+      el.innerHTML = "";
+      rows.forEach(row => {
+        const div = document.createElement("div");
+        div.className = "item";
+        div.textContent = row[label] || row.title || ("#" + row[key]);
+        div.onclick = () => clickFn(row, div);
+        el.appendChild(div);
+      });
+    }
+    function renderContentRows(rows, target) {
+      target.innerHTML = "";
+      rows.forEach(row => {
+        const box = document.createElement("div");
+        box.className = "content-card";
+        box.innerHTML = `<div class="title">${row.title || ""}</div>
+          <div class="meta">ID: ${row.id} | Date: ${row.publish_date || "-"} | Crawled: ${row.crawled_at || "-"}</div>
+          <a href="${row.url}" target="_blank">${row.url || ""}</a>`;
+        target.appendChild(box);
+      });
+    }
+    async function loadProvinces() {
+      setStatus("Loading provinces...");
+      const rows = await jget("/api/provinces");
+      renderList(provinceList, rows, async (row, el) => {
+        [...provinceList.children].forEach(i => i.classList.remove("active"));
+        el.classList.add("active");
+        selectedProvinceId = row.id;
+        await loadSections(row.id);
+      });
+      setStatus("Provinces loaded");
+    }
+    async function loadSections(provinceId) {
+      setStatus("Loading sections...");
+      const rows = await jget(`/api/provinces/${provinceId}/sections`);
+      renderList(sectionList, rows, async (row, el) => {
+        [...sectionList.children].forEach(i => i.classList.remove("active"));
+        el.classList.add("active");
+        await loadContents(row.id);
+      });
+      contentList.innerHTML = "";
+      setStatus("Sections loaded");
+    }
+    async function loadContents(sectionId) {
+      setStatus("Loading contents...");
+      const payload = await jget(`/api/sections/${sectionId}/contents?page=1&page_size=30`);
+      renderContentRows(payload.data || [], contentList);
+      setStatus("Contents loaded");
+    }
+    async function keywordSearch() {
+      const q = searchInput.value.trim();
+      if (!q) return;
+      setStatus("Keyword searching...");
+      const url = selectedProvinceId
+        ? `/api/contents/search?keyword=${encodeURIComponent(q)}&province_id=${selectedProvinceId}`
+        : `/api/contents/search?keyword=${encodeURIComponent(q)}`;
+      const rows = await jget(url);
+      searchMeta.textContent = `Keyword result: ${rows.length}`;
+      renderContentRows(rows, searchResult);
+      setStatus("Keyword search complete");
+    }
+    async function aiSearch() {
+      const q = searchInput.value.trim();
+      if (!q) return;
+      setStatus("AI searching...");
+      const url = selectedProvinceId
+        ? `/api/search/ai?query=${encodeURIComponent(q)}&province_id=${selectedProvinceId}`
+        : `/api/search/ai?query=${encodeURIComponent(q)}`;
+      const payload = await jget(url);
+      searchMeta.textContent = `AI mode: ${payload.mode || "-"} | reason: ${payload.reason || "-"} | count: ${payload.items?.length || 0}`;
+      renderContentRows(payload.items || [], searchResult);
+      setStatus("AI search complete");
+    }
+    async function triggerRefresh() {
+      setStatus("Triggering full refresh...");
+      const r = await fetch("/api/crawl/trigger", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "full" }),
+      });
+      if (!r.ok) { alert("Trigger failed: HTTP " + r.status); return; }
+      const payload = await r.json();
+      reportBox.textContent = `Refresh triggered. job_id=${payload.id}, status=${payload.status}`;
+      setStatus("Refresh triggered");
+    }
+    async function loadLatestReport() {
+      setStatus("Loading latest report...");
+      const payload = await jget("/api/crawl/report-latest");
+      reportBox.textContent = JSON.stringify(payload, null, 2);
+      const summary = payload?.summary || {};
+      const message = `Update report loaded.\nTotal: ${summary.total_updates || 0}\nNew: ${summary.new_count || 0}\nModified: ${summary.modified_count || 0}\nDeleted: ${summary.deleted_count || 0}\n\nPage will refresh now.`;
+      alert(message);
+      window.location.reload();
+      setStatus("Latest report loaded");
+    }
+    document.getElementById("keywordSearchBtn").onclick = keywordSearch;
+    document.getElementById("aiSearchBtn").onclick = aiSearch;
+    document.getElementById("refreshBtn").onclick = triggerRefresh;
+    document.getElementById("reportBtn").onclick = loadLatestReport;
+    loadProvinces().catch(err => { setStatus("Load failed"); console.error(err); });
+  </script>
+</body>
+</html>

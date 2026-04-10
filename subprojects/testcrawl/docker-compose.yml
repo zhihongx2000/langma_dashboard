@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: sqlite:////app/data/testcrawl.db
+      ADMIN_API_KEY: please-change-me
+      CRAWL_TIMEOUT_SEC: 20
+      CRAWL_MAX_SECTIONS_PER_PROVINCE: 8
+      CRAWL_MAX_ARTICLES_PER_SECTION: 20
+      CRAWL_REQUEST_DELAY_SEC: 1.0
+      CRAWL_USE_BROWSER: "true"
+      PLAYWRIGHT_HEADLESS: "true"
+      PLAYWRIGHT_WAIT_UNTIL: domcontentloaded
+      PLAYWRIGHT_TIMEOUT_MS: 20000
+      PLAYWRIGHT_POST_LOAD_WAIT_MS: 1000
+      BROWSER_USE_ENABLED: "false"
+      BROWSER_USE_MODEL: gpt-4.1-mini
+      BROWSER_USE_MAX_STEPS: 8
+      BROWSER_USE_RESULT_LIMIT: 8
+      BROWSER_USE_MIN_RESULTS_TRIGGER: 3
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      DEEPSEEK_API_BASE_URL: ${DEEPSEEK_API_BASE_URL:-https://api.deepseek.com/v1}
+      AI_SEARCH_MODEL: ${AI_SEARCH_MODEL:-deepseek-chat}
+      AI_SEARCH_CANDIDATES: ${AI_SEARCH_CANDIDATES:-120}
+      AI_SEARCH_LIMIT: ${AI_SEARCH_LIMIT:-20}
+      AUTO_REFRESH_ENABLED: ${AUTO_REFRESH_ENABLED:-true}
+      AUTO_REFRESH_HOUR: ${AUTO_REFRESH_HOUR:-12}
+      AUTO_REFRESH_MINUTE: ${AUTO_REFRESH_MINUTE:-0}
+      AUTO_REFRESH_TIMEZONE: ${AUTO_REFRESH_TIMEZONE:-Asia/Shanghai}
+    volumes:
+      - ./data:/app/data
+      - ./get.txt:/app/get.txt

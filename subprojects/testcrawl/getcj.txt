@@ -1,0 +1,96 @@
+2026年上半年各省份成绩查询网站汇总
+==============================
+
+四川
+https://cx.sceea.cn/
+
+西藏
+- http://zsks.edu.xizang.gov.cn/92/index.html
+
+新疆
+https://www.xjzk.gov.cn/gnq/cjcx/
+
+黑龙江
+- https://www.lzk.hl.cn/zk/zxxx_149/
+
+江苏
+https://sdata.jseea.cn/tpl_front/score/practiceScoreList.html
+
+甘肃
+https://kw.ganseea.cn/query/
+
+海南
+https://zk.hnks.gov.cn/#/login
+
+青海
+- https://www.qhjyks.com/zyym/ztzl/zxksz/index.htm
+
+河南
+https://datacenter.haeea.cn/PageQuery/ShowZKDCCJ.aspx
+
+吉林
+https://zkcx.jleea.com.cn/cj/cj_zk.asp
+
+宁夏
+https://baoming.nxjyks.cn:20062/login
+
+云南
+https://www.ynzs.cn/score/zxks202510.html
+
+北京
+https://zikao.bjeea.cn/portal/login.jsp
+
+浙江
+https://zk.zjzs.net/frontend/dist/login
+
+天津
+https://tjzkgl.zhaokao.net:9330/#
+
+河北
+https://zk.hebeea.edu.cn/HebzkWeb/query/queryBccj
+
+山东
+https://www.sdzk.cn/NewsList.aspx?BCID=1163&CID=60
+
+重庆
+https://www.cqksy.cn/web/column/col1846685.html
+
+辽宁
+https://www.lnzsks.com/cxzx.html
+
+江西
+http://zkcjcx.jxeea.cn:8080/zkcjcx/
+
+湖北
+https://zk.hbea.edu.cn/portal-web/login?w=1
+
+湖南
+https://nzkks.hneao.cn/student_anon
+
+安徽
+- https://www.ahzsks.cn/gdjyzxks/search2.jsp?c=77
+
+广东
+https://www.eeagd.edu.cn/selfec/
+
+山西
+- http://www.sxkszx.cn/news/zxks/index.html
+
+福建
+- https://www.eeafj.cn/zxks/
+
+贵州
+- http://zsksy.guizhou.gov.cn/zxks/ksjh/index.html
+
+陕西
+- https://www.sneea.cn/zc/zxks.htm
+
+内蒙古
+- https://www.nm.zsks.cn/kszs/zxks/
+- https://www.nm.zsks.cn/kszs/zxks/wsbmbkxt_zx/
+
+广西
+- https://www.gxeea.cn/zxks/tzgg.htm
+
+上海
+- https://www.shmeea.edu.cn/page/04000/index.html

@@ -1,0 +1,3153 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>本地测试UI - 四川四级面板</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* Aligned with langma_dashboard frontend (Landing / index.css @theme) */
+    :root {
+      --color-primary: #00342b;
+      --color-primary-container: #004d40;
+      --color-on-primary: #ffffff;
+      --color-secondary: #506169;
+      --color-secondary-container: #d1e2ec;
+      --color-on-secondary-container: #55656d;
+      --color-surface: #f9f9f9;
+      --color-surface-container-lowest: #ffffff;
+      --color-surface-container-low: #f3f3f3;
+      --color-surface-container: #eeeeee;
+      --color-on-surface: #1a1c1c;
+      --color-on-surface-variant: #3f4945;
+      --color-outline: #707975;
+      --color-outline-variant: #bfc9c4;
+      --border-subtle: rgba(191, 201, 196, 0.35);
+      --border-hairline: rgba(191, 201, 196, 0.12);
+      --accent: var(--color-primary);
+      --accent-soft: rgba(0, 52, 43, 0.06);
+      --text: var(--color-on-surface);
+      --muted: var(--color-on-surface-variant);
+      --line: var(--border-subtle);
+      --panel: var(--color-surface-container-lowest);
+      --danger: #8b1a10;
+    }
+    * { box-sizing: border-box; }
+    ::selection {
+      background: rgba(0, 52, 43, 0.2);
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, "Microsoft YaHei", "PingFang SC", "Segoe UI", Arial, sans-serif;
+      color: var(--color-on-surface);
+      background: var(--color-surface);
+      padding-bottom: 52px;
+    }
+    .font-headline {
+      font-family: Manrope, Inter, "Microsoft YaHei", sans-serif;
+    }
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.15;
+      background-image: radial-gradient(circle, var(--color-outline-variant) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .grain-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    }
+    .app-shell {
+      position: relative;
+      z-index: 20;
+    }
+    .topbar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border-hairline);
+      background: rgba(243, 243, 243, 0.82);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      flex-wrap: wrap;
+    }
+    .topbar-brand {
+      font-family: Manrope, Inter, sans-serif;
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--color-primary);
+      letter-spacing: -0.02em;
+      margin-right: 4px;
+    }
+    .env-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 12px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--color-on-surface-variant);
+      background: var(--color-surface-container-low);
+      border: 1px solid var(--border-hairline);
+      border-radius: 999px;
+    }
+    .topbar input, .topbar button, .topbar select {
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 8px 12px;
+      font-size: 13px;
+      background: var(--color-surface-container-lowest);
+      color: var(--color-on-surface);
+    }
+    .topbar button {
+      cursor: pointer;
+      font-weight: 500;
+      transition: opacity 0.15s ease, transform 0.1s ease;
+    }
+    .topbar button:hover:not(:disabled) {
+      opacity: 0.92;
+    }
+    .topbar button.primary {
+      background: var(--color-primary);
+      color: var(--color-on-primary);
+      border-color: var(--color-primary);
+      font-weight: 700;
+    }
+    .topbar label { color: var(--color-on-surface-variant); }
+    .status {
+      margin-left: auto;
+      color: var(--color-on-secondary-container);
+      font-size: 12px;
+      opacity: 0.85;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: calc(50vh - 48px) calc(50vh - 48px);
+      gap: 16px;
+      padding: 24px;
+      max-width: 1920px;
+      margin: 0 auto;
+    }
+    .panel {
+      background: var(--color-surface-container-lowest);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      overflow: auto;
+      min-height: 240px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+      transition: box-shadow 0.25s ease;
+    }
+    .panel:hover {
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+    }
+    .panel h3 {
+      margin: 0;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-hairline);
+      font-size: 15px;
+      font-family: Manrope, Inter, sans-serif;
+      font-weight: 700;
+      color: var(--color-primary);
+      letter-spacing: -0.02em;
+    }
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-hairline);
+    }
+    .panel-head h3 {
+      margin: 0;
+      padding: 0;
+      border: none;
+      font-size: 15px;
+    }
+    .level1-source-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--color-primary);
+      border-radius: 12px;
+      padding: 8px 16px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      line-height: 1;
+      color: var(--color-on-primary);
+      background: var(--color-primary);
+      text-decoration: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: opacity 0.15s ease, transform 0.1s ease;
+    }
+    .link.level1-source-link,
+    .link.level1-source-link:visited {
+      color: var(--color-on-primary);
+    }
+    .level1-source-link:hover {
+      opacity: 0.92;
+      color: var(--color-on-primary);
+      text-decoration: none;
+    }
+    .level1-source-link:active {
+      transform: translateY(1px);
+    }
+    .inner { padding: 14px 16px; }
+
+    .panel::-webkit-scrollbar,
+    .chat-log::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .panel::-webkit-scrollbar-track,
+    .chat-log::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .panel::-webkit-scrollbar-thumb,
+    .chat-log::-webkit-scrollbar-thumb {
+      background: var(--color-outline-variant);
+      border-radius: 10px;
+    }
+    .panel::-webkit-scrollbar-thumb:hover,
+    .chat-log::-webkit-scrollbar-thumb:hover {
+      background: var(--color-outline);
+    }
+
+    .item {
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      background: var(--color-surface-container-lowest);
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    .item.active, .item:hover {
+      background: var(--accent-soft);
+      border-color: rgba(0, 52, 43, 0.18);
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .row-title { flex: 1; line-height: 1.35; }
+    .row-date {
+      color: var(--muted);
+      white-space: nowrap;
+      font-size: 12px;
+      margin-left: 8px;
+    }
+
+    .meta {
+      font-size: 12px;
+      color: var(--color-on-secondary-container);
+      margin-bottom: 8px;
+      line-height: 1.5;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .search-row input {
+      flex: 1;
+      min-width: 120px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 8px 12px;
+      font-size: 13px;
+      background: var(--color-surface-container-lowest);
+      color: var(--color-on-surface);
+    }
+    .search-row button {
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      background: var(--color-surface-container-lowest);
+      color: var(--color-on-surface);
+      cursor: pointer;
+    }
+    .search-row button.primary {
+      background: var(--color-primary);
+      color: var(--color-on-primary);
+      border-color: var(--color-primary);
+      font-weight: 700;
+    }
+
+    pre {
+      white-space: pre-wrap;
+      font-size: 12px;
+      color: var(--color-on-surface-variant);
+      background: var(--color-surface-container-low);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin: 0;
+    }
+
+    .error { color: var(--danger); }
+    .link {
+      color: var(--color-primary-container);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .link:hover {
+      text-decoration: underline;
+      color: var(--color-primary);
+    }
+    .meta-link-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 8px;
+      border: 1px solid var(--color-primary);
+      border-radius: 12px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--color-on-primary);
+      background: var(--color-primary);
+      text-decoration: none;
+      transition: opacity 0.15s ease, transform 0.1s ease;
+      vertical-align: middle;
+    }
+    .meta-link-btn:hover {
+      opacity: 0.92;
+      color: var(--color-on-primary);
+      text-decoration: none;
+    }
+    .meta-link-btn:active {
+      transform: translateY(1px);
+    }
+
+    .answer-box {
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      background: var(--accent-soft);
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      white-space: pre-wrap;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--color-on-surface);
+    }
+
+    .related-item {
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      background: var(--color-surface-container-lowest);
+    }
+    .related-title {
+      font-size: 13px;
+      margin-bottom: 4px;
+      line-height: 1.35;
+    }
+    .related-meta {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .score-query-item {
+      margin-top: 12px;
+      border-style: dashed;
+    }
+    .score-query-item .row-title {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .chat-panel-inner {
+      display: flex;
+      flex-direction: column;
+      min-height: 220px;
+      max-height: calc(50vh - 100px);
+    }
+    .chat-log {
+      flex: 1;
+      overflow: auto;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 10px;
+      background: var(--color-surface-container-low);
+      margin-bottom: 8px;
+    }
+    .chat-msg {
+      margin-bottom: 10px;
+      max-width: 96%;
+    }
+    .chat-msg.user {
+      margin-left: auto;
+      text-align: right;
+    }
+    .chat-msg .bubble {
+      display: inline-block;
+      text-align: left;
+      padding: 8px 10px;
+      border-radius: 10px;
+      font-size: 13px;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .chat-msg.user .bubble {
+      background: var(--accent-soft);
+      border: 1px solid rgba(0, 52, 43, 0.15);
+    }
+    .chat-msg.assistant .bubble {
+      background: var(--color-surface-container-lowest);
+      border: 1px solid var(--border-subtle);
+    }
+    .chat-msg-head {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 2px;
+    }
+    .chat-msg.user .chat-msg-head {
+      justify-content: flex-end;
+    }
+    .chat-msg .role-label {
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .chat-copy-btn {
+      font-size: 11px;
+      padding: 2px 8px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      cursor: pointer;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+    .chat-copy-btn:hover {
+      color: var(--color-primary);
+      border-color: rgba(0, 52, 43, 0.25);
+    }
+    .panel-head button {
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 8px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      background: var(--color-surface-container-lowest);
+      color: var(--color-on-surface);
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: opacity 0.15s ease;
+    }
+    .panel-head button.primary {
+      background: var(--color-primary);
+      color: var(--color-on-primary);
+      border-color: var(--color-primary);
+    }
+    .panel-head button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(26, 28, 28, 0.45);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .modal-overlay[hidden] {
+      display: none !important;
+    }
+    .modal-panel {
+      background: var(--color-surface-container-lowest);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12);
+      max-width: 440px;
+      width: 100%;
+      padding: 20px 22px;
+    }
+    .modal-title {
+      margin: 0 0 12px;
+      font-family: Manrope, Inter, sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--color-primary);
+      letter-spacing: -0.02em;
+    }
+    .modal-body {
+      margin: 0 0 18px;
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--color-on-surface);
+      white-space: pre-line;
+      max-height: 50vh;
+      overflow: auto;
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+    .modal-actions button.primary {
+      border: 1px solid var(--color-primary);
+      border-radius: 12px;
+      padding: 10px 20px;
+      font-size: 13px;
+      font-weight: 700;
+      background: var(--color-primary);
+      color: var(--color-on-primary);
+      cursor: pointer;
+    }
+    .progress-wrap {
+      margin: 0 0 12px;
+    }
+    .progress-text {
+      margin: 0 0 6px;
+      font-size: 12px;
+      color: var(--color-on-secondary-container);
+    }
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--color-surface-container-low);
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--color-primary-container), var(--color-primary));
+      transition: width 0.2s ease;
+    }
+    .weekly-result-list {
+      margin: 0;
+      padding-left: 18px;
+      max-height: 44vh;
+      overflow: auto;
+      color: var(--color-on-surface);
+    }
+    .weekly-result-list li {
+      margin-bottom: 8px;
+      line-height: 1.45;
+      font-size: 13px;
+    }
+    .weekly-empty {
+      font-size: 13px;
+      color: var(--color-on-secondary-container);
+      margin: 6px 0;
+    }
+
+    .site-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 40;
+      background: rgba(238, 238, 238, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border-subtle);
+      padding: 12px 24px;
+      font-size: 12px;
+      letter-spacing: 0.03em;
+      color: var(--color-on-secondary-container);
+    }
+    .site-footer-inner {
+      max-width: 1920px;
+      margin: 0 auto;
+      opacity: 0.88;
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-bg" aria-hidden="true"></div>
+  <div class="grain-overlay" aria-hidden="true"></div>
+
+  <div class="app-shell">
+  <div class="topbar">
+    <span class="topbar-brand">朗玛峰 AI 工作台</span>
+    <span class="env-tag">本地测试</span>
+    <label for="provinceSelect"><strong>省份：</strong></label>
+    <select id="provinceSelect"></select>
+    <button id="refreshProvinceBtn" class="primary">刷新当前省份</button>
+    <button id="preloadCrawlerBtn" type="button">爬虫加载</button>
+    <button id="weeklyCrawlerInfoBtn" type="button">近一周爬虫信息</button>
+    <span class="status" id="statusText">就绪</span>
+  </div>
+
+  <div class="grid">
+    <section class="panel">
+      <div class="panel-head">
+        <h3 id="panel1Title">1级板块（一级）</h3>
+        <a id="scoreQueryLink" class="link level1-source-link" href="#" target="_blank" rel="noopener noreferrer" hidden>成绩查询</a>
+        <a id="level1SourceLink" class="link level1-source-link" href="#" target="_blank" rel="noopener noreferrer" hidden>查看原网址</a>
+      </div>
+      <div class="inner" id="level1Box"></div>
+    </section>
+
+    <section class="panel">
+      <h3 id="panel2Title">2级板块（二级，右侧为发布日期）</h3>
+      <div class="inner" id="level2Box"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h3 id="panel3Title">3级板块（内容爬取）</h3>
+        <button type="button" id="summarizePolicyBtn" class="primary">AI总结</button>
+      </div>
+      <div class="inner">
+        <div class="meta" id="level3Meta">请选择二级板块条目</div>
+        <pre id="level3Content">暂无内容</pre>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h3>4级板块（AI 对话）</h3>
+      <div class="inner chat-panel-inner">
+        <div class="meta" id="chatMeta">
+          普通多轮对话，与左侧省份栏目无关。需在环境变量中配置 OPENAI_API_KEY（及可选 OPENAI_BASE_URL）或 DEEPSEEK_API_KEY。
+        </div>
+        <div class="chat-log" id="chatLog"></div>
+        <div class="search-row">
+          <input id="chatInput" placeholder="输入消息，回车或点发送…" />
+          <button id="chatSendBtn" class="primary">发送</button>
+          <button id="chatClearBtn" type="button">清空对话</button>
+        </div>
+      </div>
+    </section>
+  </div>
+  </div>
+
+  <div id="reportDialog" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="reportDialogTitle" hidden>
+    <div class="modal-panel">
+      <h4 id="reportDialogTitle" class="modal-title">更新报告</h4>
+      <div id="reportDialogBody" class="modal-body"></div>
+      <div class="modal-actions">
+        <button type="button" id="reportDialogClose" class="primary">确定</button>
+      </div>
+    </div>
+  </div>
+  <div id="weeklyCrawlerDialog" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="weeklyCrawlerDialogTitle" hidden>
+    <div class="modal-panel">
+      <h4 id="weeklyCrawlerDialogTitle" class="modal-title">近一周爬虫信息（全省）</h4>
+      <div class="progress-wrap">
+        <div id="weeklyCrawlerProgressText" class="progress-text">准备查询…</div>
+        <div class="progress-track"><div id="weeklyCrawlerProgressFill" class="progress-fill"></div></div>
+      </div>
+      <div id="weeklyCrawlerResultBody" class="modal-body"></div>
+      <div class="modal-actions">
+        <button type="button" id="weeklyCrawlerDialogClose" class="primary">关闭</button>
+      </div>
+    </div>
+  </div>
+  <div id="preloadCrawlerDialog" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="preloadCrawlerDialogTitle" hidden>
+    <div class="modal-panel">
+      <h4 id="preloadCrawlerDialogTitle" class="modal-title">爬虫加载（预热一二级）</h4>
+      <div class="progress-wrap">
+        <div id="preloadCrawlerProgressText" class="progress-text">准备预热…</div>
+        <div class="progress-track"><div id="preloadCrawlerProgressFill" class="progress-fill"></div></div>
+      </div>
+      <div id="preloadCrawlerResultBody" class="modal-body"></div>
+      <div class="modal-actions">
+        <button type="button" id="preloadCrawlerDialogClose" class="primary">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="site-footer-inner">结果仅供老师参考，需人工判断</div>
+  </footer>
+
+  <script>
+    const level1Box = document.getElementById("level1Box");
+    const level2Box = document.getElementById("level2Box");
+    const level3Meta = document.getElementById("level3Meta");
+    const level3Content = document.getElementById("level3Content");
+    const statusText = document.getElementById("statusText");
+    const chatMeta = document.getElementById("chatMeta");
+    const chatLog = document.getElementById("chatLog");
+    const chatInput = document.getElementById("chatInput");
+    let chatHistory = [];
+    const provinceSelect = document.getElementById("provinceSelect");
+    const panel1Title = document.getElementById("panel1Title");
+    const panel2Title = document.getElementById("panel2Title");
+    const panel3Title = document.getElementById("panel3Title");
+
+    let selectedProvinceId = 1;
+    let selectedProvinceName = "";
+    let scoreQueryUrl = null;
+    let uiLoadSeq = 0;
+    let provinceUrlById = {};
+    let provinceNameById = {};
+    const jgetCache = new Map();
+    /** 三级正文：四川用固定路由，西藏等用通用 page/content */
+    let level3ArticleApi = "/api/test/sichuan/content";
+
+    function setLevel1SourceLink(preferredUrl) {
+      const a = document.getElementById("level1SourceLink");
+      if (!a) return;
+      const u = String(
+        preferredUrl != null && String(preferredUrl).trim() !== ""
+          ? preferredUrl
+          : (provinceUrlById[selectedProvinceId] || "")
+      ).trim();
+      if (u) {
+        a.href = u;
+        a.hidden = false;
+      } else {
+        a.removeAttribute("href");
+        a.hidden = true;
+      }
+    }
+
+    function setPanelTitlesSichuan() {
+      panel1Title.textContent = "1级板块（四川官网 · 一级）";
+      panel2Title.textContent = "2级板块（四川官网 · 二级列表）";
+      panel3Title.textContent = "3级板块（四川官网 · 正文抓取）";
+    }
+
+    function setPanelTitlesDb() {
+      panel1Title.textContent = "1级板块（已入库栏目）";
+      panel2Title.textContent = "2级板块（已入库文章）";
+      panel3Title.textContent = "3级板块（正文预览）";
+    }
+
+    function setPanelTitlesHeilongjiang() {
+      panel1Title.textContent = "1级板块（黑龙江 · 自考频道 · 二级栏目）";
+      panel2Title.textContent = "2级板块（黑龙江 · 文章列表）";
+      panel3Title.textContent = "3级板块（黑龙江 · 正文抓取）";
+    }
+
+    function setPanelTitlesJiangsu() {
+      panel1Title.textContent = "1级板块（江苏 · 分组前缀与子栏目用「-」连接）";
+      panel2Title.textContent = "2级板块（江苏 · 列表）";
+      panel3Title.textContent = "3级板块（江苏 · 正文抓取）";
+    }
+
+    function setPanelTitlesGansuPortal() {
+      panel1Title.textContent = "1级板块（甘肃自考门户 · 通知公告 / 政策规定）";
+      panel2Title.textContent = "2级板块（甘肃 · 列表）";
+      panel3Title.textContent = "3级板块（甘肃 · 正文抓取）";
+    }
+
+    function setPanelTitlesGansu2Kw() {
+      panel1Title.textContent = "1级板块（甘肃2 · 网报 public-info · 101.md 一级板块）";
+      panel2Title.textContent = "2级板块（甘肃2 · 表格行 / 说明）";
+      panel3Title.textContent = "3级板块（整页 HTML 摘要；表格行多为站内入口）";
+    }
+
+    function setPanelTitlesHainan() {
+      panel1Title.textContent = "1级板块（海南 · 自学考试）";
+      panel2Title.textContent = "2级板块（海南 · 列表）";
+      panel3Title.textContent = "3级板块（海南 · 正文抓取）";
+    }
+
+    function setPanelTitlesQinghai() {
+      panel1Title.textContent = "1级板块（青海 · 自学考试）";
+      panel2Title.textContent = "2级板块（青海 · 列表）";
+      panel3Title.textContent = "3级板块（青海 · 正文抓取）";
+    }
+
+    function setPanelTitlesNeimenggu1() {
+      panel1Title.textContent = "1级板块（内蒙古1 · 公告栏 / 政策规定）";
+      panel2Title.textContent = "2级板块（内蒙古1 · 列表）";
+      panel3Title.textContent = "3级板块（内蒙古1 · 正文抓取）";
+    }
+
+    function setPanelTitlesNeimenggu2() {
+      panel1Title.textContent = "1级板块（内蒙古2 · 自考公告 / 政策规定 / 主考学校公告栏）";
+      panel2Title.textContent = "2级板块（内蒙古2 · 列表）";
+      panel3Title.textContent = "3级板块（内蒙古2 · 正文抓取）";
+    }
+
+    function setPanelTitlesHenan1() {
+      panel1Title.textContent = "1级板块（河南1 · 自学考试）";
+      panel2Title.textContent = "2级板块（河南1 · 列表/占位）";
+      panel3Title.textContent = "3级板块（河南1 · 正文抓取）";
+    }
+
+    function setPanelTitlesHenan2() {
+      panel1Title.textContent = "1级板块（河南2 · 时间安排 / 政策·公告）";
+      panel2Title.textContent = "2级板块（河南2 · 关键词检索结果 / 列表）";
+      panel3Title.textContent = "3级板块（河南2 · 正文抓取）";
+    }
+
+    function setPanelTitlesJilin() {
+      panel1Title.textContent = "1级板块（吉林 · 通知公告 / 政策法规 / 常见问答）";
+      panel2Title.textContent = "2级板块（吉林 · 列表）";
+      panel3Title.textContent = "3级板块（吉林 · 正文抓取）";
+    }
+
+    function setPanelTitlesNingxia() {
+      panel1Title.textContent = "1级板块（宁夏 · 高等教育自学考试）";
+      panel2Title.textContent = "2级板块（宁夏 · 列表）";
+      panel3Title.textContent = "3级板块（宁夏 · 正文抓取）";
+    }
+
+    function setPanelTitlesYunnan() {
+      panel1Title.textContent = "1级板块（云南 · 自学考试）";
+      panel2Title.textContent = "2级板块（云南 · 列表）";
+      panel3Title.textContent = "3级板块（云南 · 正文抓取）";
+    }
+
+    function setPanelTitlesBeijing() {
+      panel1Title.textContent = "1级板块（北京 · 信息发布台/自考政策/近期业务/快速通道/必备知识）";
+      panel2Title.textContent = "2级板块（北京 · 列表）";
+      panel3Title.textContent = "3级板块（北京 · 正文抓取）";
+    }
+
+    function setPanelTitlesZhejiang() {
+      panel1Title.textContent = "1级板块（浙江 · 最新消息/政策文件/专业计划/考试报名/转考免考/毕业办理）";
+      panel2Title.textContent = "2级板块（浙江 · 列表）";
+      panel3Title.textContent = "3级板块（浙江 · 正文抓取）";
+    }
+
+    function setPanelTitlesTianjin() {
+      panel1Title.textContent = "1级板块（天津 · 自学考试/自考考生服务平台/重要提示/自考指南/信息查询/咨询渠道）";
+      panel2Title.textContent = "2级板块（天津 · 列表）";
+      panel3Title.textContent = "3级板块（天津 · 正文抓取）";
+    }
+
+    function setPanelTitlesHebei() {
+      panel1Title.textContent = "1级板块（河北 · 最新通知公告/查询中心/考生必读）";
+      panel2Title.textContent = "2级板块（河北 · 列表）";
+      panel3Title.textContent = "3级板块（河北 · 正文抓取）";
+    }
+
+    function setPanelTitlesShandong() {
+      panel1Title.textContent = "1级板块（山东 · 自学考试）";
+      panel2Title.textContent = "2级板块（山东 · 列表）";
+      panel3Title.textContent = "3级板块（山东 · 正文抓取）";
+    }
+
+    function setPanelTitlesChongqing() {
+      panel1Title.textContent = "1级板块（重庆 · 自学考试）";
+      panel2Title.textContent = "2级板块（重庆 · 列表）";
+      panel3Title.textContent = "3级板块（重庆 · 正文抓取）";
+    }
+
+    function setPanelTitlesShaanxi() {
+      panel1Title.textContent = "1级板块（陕西 · 自学考试）";
+      panel2Title.textContent = "2级板块（陕西 · 列表）";
+      panel3Title.textContent = "3级板块（陕西 · 正文抓取）";
+    }
+
+    function setPanelTitlesShanxi() {
+      panel1Title.textContent = "1级板块（山西 · 自学考试）";
+      panel2Title.textContent = "2级板块（山西 · 列表）";
+      panel3Title.textContent = "3级板块（山西 · 正文抓取）";
+    }
+
+    function setPanelTitlesLiaoning1() {
+      panel1Title.textContent = "1级板块（辽宁1 · 自学考试）";
+      panel2Title.textContent = "2级板块（辽宁1 · 列表）";
+      panel3Title.textContent = "3级板块（辽宁1 · 正文抓取）";
+    }
+
+    function setPanelTitlesLiaoning2() {
+      panel1Title.textContent = "1级板块（辽宁2 · 温馨提示/政策规定/考生须知）";
+      panel2Title.textContent = "2级板块（辽宁2 · 列表）";
+      panel3Title.textContent = "3级板块（辽宁2 · 正文抓取）";
+    }
+
+    function setPanelTitlesJiangxi() {
+      panel1Title.textContent = "1级板块（江西 · 考试动态/通知公告/常见问答）";
+      panel2Title.textContent = "2级板块（江西 · 列表）";
+      panel3Title.textContent = "3级板块（江西 · 正文抓取）";
+    }
+
+    function setPanelTitlesHubei() {
+      panel1Title.textContent = "1级板块（湖北 · 自学考试/社会助学/考籍管理/自考考务/自考计划）";
+      panel2Title.textContent = "2级板块（湖北 · 列表）";
+      panel3Title.textContent = "3级板块（湖北 · 正文抓取）";
+    }
+
+    function setPanelTitlesHunan() {
+      panel1Title.textContent = "1级板块（湖南 · 2026年考试日程/最新消息/通知公告/自考政策/开考课程计划/考试大纲/考试计划）";
+      panel2Title.textContent = "2级板块（湖南 · 列表）";
+      panel3Title.textContent = "3级板块（湖南 · 正文抓取）";
+    }
+
+    function setPanelTitlesFujian() {
+      panel1Title.textContent = "1级板块（福建 · 公示公告/自考动态/政策文件）";
+      panel2Title.textContent = "2级板块（福建 · 列表）";
+      panel3Title.textContent = "3级板块（福建 · 正文抓取）";
+    }
+
+    function setPanelTitlesGuizhou() {
+      panel1Title.textContent = "1级板块（贵州 · 考试报名/专业计划/通知公告）";
+      panel2Title.textContent = "2级板块（贵州 · 列表）";
+      panel3Title.textContent = "3级板块（贵州 · 正文抓取）";
+    }
+
+    function setPanelTitlesGuangxi() {
+      panel1Title.textContent = "1级板块（广西 · 通知公告 / 招生问答 / 招考日程）";
+      panel2Title.textContent = "2级板块（广西 · 列表）";
+      panel3Title.textContent = "3级板块（广西 · 正文抓取）";
+    }
+
+    function setPanelTitlesShanghai() {
+      panel1Title.textContent = "1级板块（上海 · 自考新闻 / 考试日程 / 政策法规 / 大纲教材）";
+      panel2Title.textContent = "2级板块（上海 · 列表）";
+      panel3Title.textContent = "3级板块（上海 · 正文抓取）";
+    }
+
+    function setPanelTitlesAnhui() {
+      panel1Title.textContent = "1级板块（安徽 · 自考动态/考试安排/教材版本/主考院校/政策文件/助学管理/业务办理/本科/专科）";
+      panel2Title.textContent = "2级板块（安徽 · 列表）";
+      panel3Title.textContent = "3级板块（安徽 · 正文抓取）";
+    }
+
+    function setPanelTitlesGuangdong1() {
+      panel1Title.textContent = "1级板块（广东1 · 自学考试）";
+      panel2Title.textContent = "2级板块（广东1 · 列表）";
+      panel3Title.textContent = "3级板块（广东1 · 正文抓取）";
+    }
+
+    function setPanelTitlesGuangdong2() {
+      panel1Title.textContent = "1级板块（广东2 · 专业计划/助学管理/考务管理/考籍管理/其他公告）";
+      panel2Title.textContent = "2级板块（广东2 · 列表）";
+      panel3Title.textContent = "3级板块（广东2 · 正文抓取）";
+    }
+
+    function setPanelTitlesXinjiang() {
+      panel1Title.textContent = "1级板块（新疆官网 · 通知公告 / 政策资讯）";
+      panel2Title.textContent = "2级板块（新疆官网 · 列表）";
+      panel3Title.textContent = "3级板块（新疆官网 · 正文抓取）";
+    }
+
+    function setPanelTitlesXizang() {
+      panel1Title.textContent = "1级板块（西藏官网 · 通知/政策/简章）";
+      panel2Title.textContent = "2级板块（西藏官网 · 列表）";
+      panel3Title.textContent = "3级板块（西藏官网 · 正文抓取）";
+    }
+
+    function setStatus(text) {
+      statusText.textContent = text;
+    }
+
+    function apiUrl(path) {
+      if (!path || path.startsWith("http://") || path.startsWith("https://")) return path;
+      return window.location.origin + path;
+    }
+
+    async function jget(url, headers = {}) {
+      const full = apiUrl(url);
+      const cacheKey = full + "||" + JSON.stringify(headers || {});
+      if (jgetCache.has(cacheKey)) return jgetCache.get(cacheKey);
+      const r = await fetch(full, { headers });
+      if (!r.ok) throw new Error("HTTP " + r.status + " " + full);
+      const payload = await r.json();
+      jgetCache.set(cacheKey, payload);
+      return payload;
+    }
+
+    async function jpost(url, body, headers = {}) {
+      const full = apiUrl(url);
+      const r = await fetch(full, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...headers },
+        body: JSON.stringify(body),
+      });
+      if (!r.ok) throw new Error("HTTP " + r.status + " " + full);
+      return r.json();
+    }
+
+    async function jpostChat(body) {
+      const paths = ["/api/test/chat", "/api/test/ai/chat"];
+      let lastErr = null;
+      for (const p of paths) {
+        const full = apiUrl(p);
+        const r = await fetch(full, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        if (r.ok) return r.json();
+        lastErr = new Error("HTTP " + r.status + " " + full);
+        if (r.status !== 404) throw lastErr;
+      }
+      throw lastErr;
+    }
+
+    function appendScoreQueryEntry() {
+      const a = document.getElementById("scoreQueryLink");
+      if (!a) return;
+      if (!scoreQueryUrl) {
+        a.removeAttribute("href");
+        a.hidden = true;
+        return;
+      }
+      a.href = scoreQueryUrl;
+      a.hidden = false;
+    }
+
+    function renderLevel1(rows) {
+      level1Box.innerHTML = "";
+      rows.forEach((row, idx) => {
+        const d = document.createElement("div");
+        d.className = "item";
+        d.textContent = row.name;
+        d.onclick = () => {
+          [...level1Box.children].forEach(i => i.classList.remove("active"));
+          d.classList.add("active");
+          renderLevel2(row.items || []);
+        };
+        level1Box.appendChild(d);
+
+        if (idx === 0) {
+          d.classList.add("active");
+          renderLevel2(row.items || []);
+        }
+      });
+
+      appendScoreQueryEntry();
+    }
+
+    function renderLevel2(items) {
+      level2Box.innerHTML = "";
+      items.forEach(row => {
+        const d = document.createElement("div");
+        d.className = "item";
+        d.innerHTML = `
+          <div class="row">
+            <div class="row-title">${escapeHtml(row.title || "")}</div>
+            <div class="row-date">${escapeHtml(row.publish_date || "-")}</div>
+          </div>
+        `;
+        d.onclick = async () => {
+          [...level2Box.children].forEach(i => i.classList.remove("active"));
+          d.classList.add("active");
+          await loadLevel3(row.url, row.title);
+        };
+        level2Box.appendChild(d);
+      });
+
+      level3Meta.textContent = "请选择二级板块条目";
+      level3Content.textContent = "暂无内容";
+    }
+
+    async function loadScoreQueryUrl(pid, pname, seq) {
+      const qs = new URLSearchParams();
+      qs.set("province_id", String(pid));
+      if (pname) qs.set("display_name", pname);
+      const payload = await jget(`/api/test/score-query?${qs.toString()}`);
+      if (seq !== uiLoadSeq) return null;
+      const u = payload.score_query_url;
+      return u === null || u === undefined || u === "" ? null : u;
+    }
+
+    async function loadProvinces() {
+      const provinces = await jget("/api/provinces");
+      provinceSelect.innerHTML = "";
+
+      provinceUrlById = {};
+      provinceNameById = {};
+      provinces.forEach(p => {
+        provinceUrlById[p.id] = p.url || "";
+        provinceNameById[p.id] = p.name || "";
+        const opt = document.createElement("option");
+        opt.value = String(p.id);
+        opt.textContent = p.name;
+        provinceSelect.appendChild(opt);
+      });
+
+      const sichuan = provinces.find(p => p.name.includes("四川"));
+      const def = sichuan || provinces[0];
+      selectedProvinceId = def?.id || 1;
+      selectedProvinceName = def?.name || "";
+      provinceSelect.value = String(selectedProvinceId);
+      setLevel1SourceLink();
+    }
+
+    function resolveSpecialLevelsEndpoint(pid) {
+      const pname = String(provinceNameById[pid] || "");
+      const purl = String(provinceUrlById[pid] || "").toLowerCase();
+      if (pname.includes("海南")) return "/api/test/hainan/levels";
+      if (pname.includes("青海")) return "/api/test/qinghai/levels";
+      if (
+        purl.includes("zkxxggl") &&
+        (pname.includes("内蒙古2") || pname.includes("内蒙古"))
+      ) return "/api/test/neimenggu2/levels";
+      if (
+        purl.includes("nm.zsks.cn") &&
+        !purl.includes("zkxxggl") &&
+        !purl.includes("wsbmbkxt") &&
+        (pname.includes("内蒙古1") || pname.includes("内蒙古"))
+      ) return "/api/test/neimenggu1/levels";
+      if (pname.includes("河南") && purl.includes("haeea.cn/zixuekaoshi")) return "/api/test/henan1/levels";
+      if (pname.includes("河南") && purl.includes("zkwb.haeea.cn")) return "/api/test/henan2/levels";
+      if (pname.includes("吉林") && purl.includes("jleea.com.cn/front/channel/9944")) return "/api/test/jilin/levels";
+      if (pname.includes("宁夏") && purl.includes("nxjyks.cn/contents/zxks")) return "/api/test/ningxia/levels";
+      if (pname.includes("云南") && purl.includes("ynzs.cn/html/web/zkdt-zxks")) return "/api/test/yunnan/levels";
+      if (pname.includes("北京") && purl.includes("bjeea.cn/html/selfstudy")) return "/api/test/beijing/levels";
+      if (pname.includes("浙江") && purl.includes("zjzs.net/col/col21")) return "/api/test/zhejiang/levels";
+      if (pname.includes("天津") && purl.includes("zhaokao.net/zxks/zyts")) return "/api/test/tianjin/levels";
+      if (pname.includes("河北") && purl.includes("zk.hebeea.edu.cn/hebzkweb/index")) return "/api/test/hebei/levels";
+      if (pname.includes("山东") && purl.includes("sdzk.cn/newslistm.aspx?bcid=5&cid=1163")) return "/api/test/shandong/levels";
+      if (pname.includes("重庆") && purl.includes("cqksy.cn/web/column/col1846543.html")) return "/api/test/chongqing/levels";
+      if (pname.includes("陕西") && purl.includes("sneea.cn/zc/zxks")) return "/api/test/shaanxi/levels";
+      if (pname.includes("山西") && purl.includes("sxkszx.cn/news/zxks/index")) return "/api/test/shanxi/levels";
+      if (pname.includes("辽宁") && purl.includes("lnzsks.com/listinfo/zxks_1.html")) return "/api/test/liaoning1/levels";
+      if (pname.includes("辽宁") && purl.includes("zk.lnzsks.com/lnzk.wb")) return "/api/test/liaoning2/levels";
+      if (pname.includes("江西") && purl.includes("jxeea.cn/jxsjyksy/zxks55/list.html")) return "/api/test/jiangxi/levels";
+      if (pname.includes("湖北") && purl.includes("hbea.edu.cn/html/zxks/index.shtml")) return "/api/test/hubei/levels";
+      if (pname.includes("湖南") && purl.includes("nzkks.hneao.cn/student_anon/home")) return "/api/test/hunan/levels";
+      if (pname.includes("福建") && purl.includes("eeafj.cn/zxks")) return "/api/test/fujian/levels";
+      if (pname.includes("贵州") && purl.includes("zsksy.guizhou.gov.cn/zxks")) return "/api/test/guizhou/levels";
+      if (pname.includes("广西") && purl.includes("gxeea.cn/zxks")) return "/api/test/guangxi/levels";
+      if (pname.includes("上海") && purl.includes("shmeea.edu.cn/page/04000")) return "/api/test/shmeea/levels";
+      if (pname.includes("安徽") && purl.includes("ahzsks.cn/gdjyzxks")) return "/api/test/anhui/levels";
+      if (pname.includes("广东") && purl.includes("eeagd.edu.cn/selfec")) return "/api/test/guangdong2/levels";
+      if (pname.includes("广东") && purl.includes("eea.gd.gov.cn/zxks/index")) return "/api/test/guangdong1/levels";
+      if (pname.includes("黑龙江")) return "/api/test/heilongjiang/levels";
+      if (pname.includes("江苏")) return "/api/test/jiangsu/levels";
+      if (pname.includes("甘肃") && purl.includes("public-info")) return "/api/test/gansu2/levels";
+      if (pname.includes("甘肃") && purl.includes("zixuekaoshi")) return "/api/test/gansu/levels";
+      if (pname.includes("新疆")) return "/api/test/xinjiang/levels";
+      if (pname.includes("西藏")) return "/api/test/xizang/levels";
+      if (pname.includes("四川")) return "/api/test/sichuan/levels";
+      return null;
+    }
+
+    async function prefetchProvinceL12(pid) {
+      const pname = String(provinceNameById[pid] || "");
+      try {
+        const qs = new URLSearchParams();
+        qs.set("province_id", String(pid));
+        if (pname) qs.set("display_name", pname);
+        await jget(`/api/test/score-query?${qs.toString()}`);
+      } catch (_) {}
+
+      const specialEndpoint = resolveSpecialLevelsEndpoint(pid);
+      if (specialEndpoint) {
+        await jget(specialEndpoint);
+        return;
+      }
+
+      const sections = await jget(`/api/provinces/${pid}/sections`);
+      for (const sec of sections || []) {
+        await jget(`/api/sections/${sec.id}/contents?page=1&page_size=50`);
+      }
+    }
+
+    function openPreloadCrawlerDialog() {
+      document.getElementById("preloadCrawlerDialog").hidden = false;
+      document.getElementById("preloadCrawlerDialogClose").focus();
+    }
+
+    function closePreloadCrawlerDialog() {
+      document.getElementById("preloadCrawlerDialog").hidden = true;
+    }
+
+    function setPreloadCrawlerProgress(done, total) {
+      const safeTotal = Math.max(1, total || 1);
+      const pct = Math.min(100, Math.round((done / safeTotal) * 100));
+      document.getElementById("preloadCrawlerProgressFill").style.width = pct + "%";
+      document.getElementById("preloadCrawlerProgressText").textContent =
+        `预热进度：${done}/${total}（${pct}%）`;
+    }
+
+    async function preloadAllProvincesL12(opts = {}) {
+      const silent = Boolean(opts && opts.silent);
+      if (!silent) openPreloadCrawlerDialog();
+      const box = document.getElementById("preloadCrawlerResultBody");
+      if (!silent) {
+        box.innerHTML = '<div class="weekly-empty">正在并发预热（5）所有省份一二级数据…</div>';
+      }
+      try {
+        const provinces = await jget("/api/provinces");
+        const ids = (provinces || []).map(p => p.id);
+        const total = ids.length;
+        let done = 0;
+        let ok = 0;
+        let failed = 0;
+        const MAX_CONCURRENCY = 5;
+        setPreloadCrawlerProgress(0, total);
+        const workers = Array.from({ length: Math.min(MAX_CONCURRENCY, total) }, async (_, workerIdx) => {
+          for (let i = workerIdx; i < total; i += MAX_CONCURRENCY) {
+            const pid = ids[i];
+            try {
+              await prefetchProvinceL12(pid);
+              ok += 1;
+            } catch (_) {
+              failed += 1;
+            }
+            done += 1;
+            if (!silent) setPreloadCrawlerProgress(done, total);
+          }
+        });
+        await Promise.all(workers);
+        if (!silent) {
+          box.innerHTML = `<div class="weekly-empty">预热完成：成功 ${ok} 省，失败 ${failed} 省。之后切换省份会优先命中缓存，打开更快。</div>`;
+        } else {
+          setStatus(`后台预热完成：成功 ${ok} 省，失败 ${failed} 省`);
+        }
+      } catch (err) {
+        const msg = err && err.message ? err.message : String(err);
+        if (!silent) {
+          box.innerHTML = `<div class="weekly-empty">预热失败：${escapeHtml(msg)}</div>`;
+        } else {
+          console.error("silent preload failed:", err);
+        }
+      }
+    }
+
+    async function loadDbSectionsAndContents(seq, expectedPid) {
+      if (seq !== uiLoadSeq || selectedProvinceId !== expectedPid) return;
+      setPanelTitlesDb();
+      setLevel1SourceLink();
+      setStatus("加载已入库栏目…");
+      level1Box.innerHTML = "";
+      const sections = await jget(`/api/provinces/${expectedPid}/sections`);
+      if (seq !== uiLoadSeq || selectedProvinceId !== expectedPid) return;
+      if (!sections.length) {
+        level1Box.innerHTML =
+          '<div class="meta">该省份暂无栏目数据。可先点「全量爬取」或「刷新当前省份」触发爬取，完成后刷新本页。</div>';
+        appendScoreQueryEntry();
+        level2Box.innerHTML = "";
+        level3Meta.textContent = "等待爬取完成后即可浏览栏目与文章";
+        level3Content.textContent = "暂无内容";
+        setStatus("无栏目数据");
+        return;
+      }
+
+      for (const sec of sections) {
+        const d = document.createElement("div");
+        d.className = "item";
+        d.textContent = sec.name || "栏目 #" + sec.id;
+        d.onclick = () => {
+          [...level1Box.children].forEach(i => i.classList.remove("active"));
+          d.classList.add("active");
+          loadDbContents(sec.id);
+        };
+        level1Box.appendChild(d);
+      }
+      appendScoreQueryEntry();
+
+      const firstSec = sections[0];
+      const firstItem = level1Box.querySelector(".item");
+      if (firstItem) firstItem.classList.add("active");
+      if (seq !== uiLoadSeq || selectedProvinceId !== expectedPid) return;
+      try {
+        await loadDbContents(firstSec.id);
+      } catch (err) {
+        console.error(err);
+      }
+      if (seq !== uiLoadSeq || selectedProvinceId !== expectedPid) return;
+      setStatus("栏目与文章已加载（数据库）");
+    }
+
+    async function loadDbContents(sectionId) {
+      setStatus("加载文章列表…");
+      const payload = await jget(`/api/sections/${sectionId}/contents?page=1&page_size=50`);
+      const rows = payload.data || [];
+      level2Box.innerHTML = "";
+      rows.forEach(row => {
+        const d = document.createElement("div");
+        d.className = "item";
+        d.innerHTML = `
+          <div class="row">
+            <div class="row-title">${escapeHtml(row.title || "")}</div>
+            <div class="row-date">${escapeHtml(row.publish_date || "-")}</div>
+          </div>
+        `;
+        d.onclick = async () => {
+          [...level2Box.children].forEach(i => i.classList.remove("active"));
+          d.classList.add("active");
+          await loadDbContentDetail(row.id, row.title, row.url);
+        };
+        level2Box.appendChild(d);
+      });
+      level3Meta.textContent = "请选择文章查看正文";
+      level3Content.textContent = "暂无内容";
+      setStatus(rows.length ? "文章列表已加载" : "该栏目下暂无文章");
+    }
+
+    async function loadDbContentDetail(id, title, url) {
+      setStatus("加载正文…");
+      const safeTitle = escapeHtml(title || "");
+      const safeUrl = escapeHtml(url || "");
+      level3Meta.innerHTML = `标题：${safeTitle}<a class="meta-link-btn" href="${safeUrl}" target="_blank" rel="noopener noreferrer">查看原网址</a>`;
+      const detail = await jget(`/api/contents/${id}`);
+      const text = (detail.content_text || "").slice(0, 12000);
+      level3Content.textContent = text || "空内容";
+      setStatus("正文已加载");
+    }
+
+    async function loadLevelData() {
+      const seq = ++uiLoadSeq;
+      const pid = selectedProvinceId;
+      const pname = selectedProvinceName;
+      const isSc = String(pname || "").includes("四川");
+      const isXz = String(pname || "").includes("西藏");
+      const isXj = String(pname || "").includes("新疆");
+      const isHlj = String(pname || "").includes("黑龙江");
+      const isJs = String(pname || "").includes("江苏");
+      const isHainan = String(pname || "").includes("海南");
+      const isQinghai = String(pname || "").includes("青海");
+      const nmPortalUrl = String(provinceUrlById[pid] || "").toLowerCase();
+      const isNeimenggu2 =
+        nmPortalUrl.includes("zkxxggl") &&
+        (String(pname || "").includes("内蒙古2") ||
+          String(pname || "").includes("内蒙古"));
+      const isNeimenggu1 =
+        nmPortalUrl.includes("nm.zsks.cn") &&
+        !nmPortalUrl.includes("zkxxggl") &&
+        !nmPortalUrl.includes("wsbmbkxt") &&
+        (String(pname || "").includes("内蒙古1") ||
+          String(pname || "").includes("内蒙古"));
+      const isHenan1 =
+        String(pname || "").includes("河南") &&
+        String(provinceUrlById[pid] || "").toLowerCase().includes("haeea.cn/zixuekaoshi");
+      const isHenan2 =
+        String(pname || "").includes("河南") &&
+        String(provinceUrlById[pid] || "").toLowerCase().includes("zkwb.haeea.cn");
+      const isJilin =
+        String(pname || "").includes("吉林") &&
+        String(provinceUrlById[pid] || "").toLowerCase().includes("jleea.com.cn/front/channel/9944");
+      const isNingxia =
+        String(pname || "").includes("宁夏") &&
+        String(provinceUrlById[pid] || "").toLowerCase().includes("nxjyks.cn/contents/zxks");
+      const isYunnan =
+        String(pname || "").includes("云南") &&
+        String(provinceUrlById[pid] || "").toLowerCase().includes("ynzs.cn/html/web/zkdt-zxks");
+      const isBeijing =
+        String(pname || "").includes("北京") &&
+        String(provinceUrlById[pid] || "").toLowerCase().includes("bjeea.cn/html/selfstudy");
+      const isZhejiang =
+        String(pname || "").includes("浙江") &&
+        String(provinceUrlById[pid] || "").toLowerCase().includes("zjzs.net/col/col21");
+      const isTianjin =
+        String(pname || "").includes("天津") &&
+        String(provinceUrlById[pid] || "").toLowerCase().includes("zhaokao.net/zxks/zyts");
+      const isHebei =
+        String(pname || "").includes("河北") &&
+        String(provinceUrlById[pid] || "").toLowerCase().includes("zk.hebeea.edu.cn/hebzkweb/index");
+      const isShandong =
+        String(pname || "").includes("山东") &&
+        String(provinceUrlById[pid] || "").toLowerCase().includes("sdzk.cn/newslistm.aspx?bcid=5&cid=1163");
+      const isChongqing =
+        String(pname || "").includes("重庆") &&
+        String(provinceUrlById[pid] || "").toLowerCase().includes("cqksy.cn/web/column/col1846543.html");
+      const isShaanxi =
+        String(pname || "").includes("陕西") &&
+        String(provinceUrlById[pid] || "").toLowerCase().includes("sneea.cn/zc/zxks");
+      const isShanxi =
+        String(pname || "").includes("山西") &&
+        String(provinceUrlById[pid] || "").toLowerCase().includes("sxkszx.cn/news/zxks/index");
+      const isLiaoning1 =
+        String(pname || "").includes("辽宁") &&
+        String(provinceUrlById[pid] || "").toLowerCase().includes("lnzsks.com/listinfo/zxks_1.html");
+      const isLiaoning2 =
+        String(pname || "").includes("辽宁") &&
+        String(provinceUrlById[pid] || "").toLowerCase().includes("zk.lnzsks.com/lnzk.wb");
+      const isJiangxi =
+        String(pname || "").includes("江西") &&
+        String(provinceUrlById[pid] || "").toLowerCase().includes("jxeea.cn/jxsjyksy/zxks55/list.html");
+      const isHubei =
+        String(pname || "").includes("湖北") &&
+        String(provinceUrlById[pid] || "").toLowerCase().includes("hbea.edu.cn/html/zxks/index.shtml");
+      const isHunan =
+        String(pname || "").includes("湖南") &&
+        String(provinceUrlById[pid] || "").toLowerCase().includes("nzkks.hneao.cn/student_anon/home");
+      const isFujian =
+        String(pname || "").includes("福建") &&
+        String(provinceUrlById[pid] || "").toLowerCase().includes("eeafj.cn/zxks");
+      const isGuizhou =
+        String(pname || "").includes("贵州") &&
+        String(provinceUrlById[pid] || "").toLowerCase().includes("zsksy.guizhou.gov.cn/zxks");
+      const isGuangxi =
+        String(pname || "").includes("广西") &&
+        String(provinceUrlById[pid] || "").toLowerCase().includes("gxeea.cn/zxks");
+      const isShanghai =
+        String(pname || "").includes("上海") &&
+        String(provinceUrlById[pid] || "").toLowerCase().includes("shmeea.edu.cn/page/04000");
+      const isAnhui =
+        String(pname || "").includes("安徽") &&
+        String(provinceUrlById[pid] || "").toLowerCase().includes("ahzsks.cn/gdjyzxks");
+      const isGuangdong2 =
+        String(pname || "").includes("广东") &&
+        String(provinceUrlById[pid] || "").toLowerCase().includes("eeagd.edu.cn/selfec");
+      const isGuangdong1 =
+        String(pname || "").includes("广东") &&
+        String(provinceUrlById[pid] || "").toLowerCase().includes("eea.gd.gov.cn/zxks/index");
+      const gansuEntryUrl = String(provinceUrlById[pid] || "").toLowerCase();
+      const isGansu2Kw =
+        String(pname || "").includes("甘肃") && gansuEntryUrl.includes("public-info");
+      const isGansuPortal =
+        String(pname || "").includes("甘肃") && gansuEntryUrl.includes("zixuekaoshi");
+      scoreQueryUrl = null;
+      level3ArticleApi = "/api/test/sichuan/content";
+
+      const sqUrl = await loadScoreQueryUrl(pid, pname, seq);
+      if (seq !== uiLoadSeq) return;
+      scoreQueryUrl = sqUrl;
+
+      if (isHainan) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesHainan();
+        setLevel1SourceLink();
+        setStatus("加载海南自学考试栏目…");
+        try {
+          const payload = await jget("/api/test/hainan/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到海南自学考试栏目，请检查官网结构是否变更。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("海南栏目为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("海南自学考试栏目已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">海南栏目请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("海南加载失败");
+        }
+        return;
+      }
+
+      if (isQinghai) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesQinghai();
+        setLevel1SourceLink();
+        setStatus("加载青海自学考试栏目…");
+        try {
+          const payload = await jget("/api/test/qinghai/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到青海自学考试栏目，请检查官网结构是否变更。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("青海栏目为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("青海自学考试栏目已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">青海栏目请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("青海加载失败");
+        }
+        return;
+      }
+
+      if (isNeimenggu2) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesNeimenggu2();
+        setLevel1SourceLink();
+        setStatus("加载内蒙古2（自考公告 / 政策规定 / 主考学校公告栏）…");
+        try {
+          const payload = await jget("/api/test/neimenggu2/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到内蒙古2 栏目，请检查官网结构是否变更。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("内蒙古2 栏目为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("内蒙古2 栏目已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">内蒙古2 栏目请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("内蒙古2 加载失败");
+        }
+        return;
+      }
+
+      if (isNeimenggu1) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesNeimenggu1();
+        setLevel1SourceLink();
+        setStatus("加载内蒙古1（公告栏 / 政策规定）…");
+        try {
+          const payload = await jget("/api/test/neimenggu1/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到内蒙古1 栏目，请检查官网结构是否变更。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("内蒙古1 栏目为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("内蒙古1 栏目已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">内蒙古1 栏目请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("内蒙古1 加载失败");
+        }
+        return;
+      }
+
+      if (isHenan1) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesHenan1();
+        setLevel1SourceLink();
+        setStatus("加载河南1 自学考试栏目…");
+        try {
+          const payload = await jget("/api/test/henan1/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到河南1 自学考试栏目，请检查站点是否可访问。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("河南1 栏目为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("河南1 自学考试栏目已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">河南1 栏目请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("河南1 加载失败");
+        }
+        return;
+      }
+
+      if (isHenan2) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesHenan2();
+        setLevel1SourceLink();
+        setStatus("加载河南2（时间安排 / 政策·公告）…");
+        try {
+          const payload = await jget("/api/test/henan2/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到河南2 栏目，请检查站点是否可访问。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("河南2 栏目为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("河南2 栏目已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">河南2 栏目请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("河南2 加载失败");
+        }
+        return;
+      }
+
+      if (isJilin) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesJilin();
+        setLevel1SourceLink();
+        setStatus("加载吉林自考栏目…");
+        try {
+          const payload = await jget("/api/test/jilin/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到吉林栏目，请检查官网结构是否变更。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("吉林栏目为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("吉林自考栏目已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">吉林栏目请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("吉林加载失败");
+        }
+        return;
+      }
+
+      if (isNingxia) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesNingxia();
+        setLevel1SourceLink();
+        setStatus("加载宁夏自学考试栏目…");
+        try {
+          const payload = await jget("/api/test/ningxia/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到宁夏自学考试栏目，请检查官网结构是否变更。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("宁夏栏目为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("宁夏自学考试栏目已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">宁夏栏目请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("宁夏加载失败");
+        }
+        return;
+      }
+
+      if (isYunnan) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesYunnan();
+        setLevel1SourceLink();
+        setStatus("加载云南自学考试栏目…");
+        try {
+          const payload = await jget("/api/test/yunnan/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到云南自学考试栏目，请检查官网结构是否变更。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("云南栏目为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("云南自学考试栏目已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">云南栏目请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("云南加载失败");
+        }
+        return;
+      }
+
+      if (isBeijing) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesBeijing();
+        setLevel1SourceLink();
+        setStatus("加载北京自学考试栏目…");
+        try {
+          const payload = await jget("/api/test/beijing/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到北京自学考试栏目，请检查官网结构是否变更。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("北京栏目为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("北京自学考试栏目已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">北京栏目请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("北京加载失败");
+        }
+        return;
+      }
+
+      if (isZhejiang) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesZhejiang();
+        setLevel1SourceLink();
+        setStatus("加载浙江自学考试栏目…");
+        try {
+          const payload = await jget("/api/test/zhejiang/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到浙江自学考试栏目，请检查官网结构是否变更。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("浙江栏目为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("浙江自学考试栏目已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">浙江栏目请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("浙江加载失败");
+        }
+        return;
+      }
+
+      if (isTianjin) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesTianjin();
+        setLevel1SourceLink();
+        setStatus("加载天津自学考试栏目…");
+        try {
+          const payload = await jget("/api/test/tianjin/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到天津自学考试栏目，请检查官网结构是否变更。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("天津栏目为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("天津自学考试栏目已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">天津栏目请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("天津加载失败");
+        }
+        return;
+      }
+
+      if (isHebei) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesHebei();
+        setLevel1SourceLink();
+        setStatus("加载河北自学考试栏目…");
+        try {
+          const payload = await jget("/api/test/hebei/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到河北自学考试栏目，请检查官网结构是否变更。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("河北栏目为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("河北自学考试栏目已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">河北栏目请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("河北加载失败");
+        }
+        return;
+      }
+
+      if (isShandong) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesShandong();
+        setLevel1SourceLink();
+        setStatus("加载山东自学考试栏目…");
+        try {
+          const payload = await jget("/api/test/shandong/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到山东自学考试栏目，请检查官网结构是否变更。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("山东栏目为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("山东自学考试栏目已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">山东栏目请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("山东加载失败");
+        }
+        return;
+      }
+
+      if (isChongqing) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesChongqing();
+        setLevel1SourceLink();
+        setStatus("加载重庆自学考试栏目…");
+        try {
+          const payload = await jget("/api/test/chongqing/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到重庆自学考试栏目，请检查官网结构是否变更。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("重庆栏目为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("重庆自学考试栏目已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">重庆栏目请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("重庆加载失败");
+        }
+        return;
+      }
+
+      if (isShaanxi) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesShaanxi();
+        setLevel1SourceLink();
+        setStatus("加载陕西自学考试栏目…");
+        try {
+          const payload = await jget("/api/test/shaanxi/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到陕西自学考试栏目，请检查官网结构是否变更。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("陕西栏目为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("陕西自学考试栏目已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">陕西栏目请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("陕西加载失败");
+        }
+        return;
+      }
+
+      if (isShanxi) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesShanxi();
+        setLevel1SourceLink();
+        setStatus("加载山西自学考试栏目…");
+        try {
+          const payload = await jget("/api/test/shanxi/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到山西自学考试栏目，请检查官网结构是否变更。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("山西栏目为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("山西自学考试栏目已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">山西栏目请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("山西加载失败");
+        }
+        return;
+      }
+
+      if (isLiaoning1) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesLiaoning1();
+        setLevel1SourceLink();
+        setStatus("加载辽宁1 自学考试栏目…");
+        try {
+          const payload = await jget("/api/test/liaoning1/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到辽宁1 自学考试栏目，请检查官网结构是否变更。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("辽宁1 栏目为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("辽宁1 自学考试栏目已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">辽宁1 栏目请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("辽宁1 加载失败");
+        }
+        return;
+      }
+
+      if (isLiaoning2) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesLiaoning2();
+        setLevel1SourceLink();
+        setStatus("加载辽宁2 栏目（温馨提示/政策规定/考生须知）…");
+        try {
+          const payload = await jget("/api/test/liaoning2/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到辽宁2 栏目，请检查官网结构是否变更。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("辽宁2 栏目为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("辽宁2 栏目已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">辽宁2 栏目请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("辽宁2 加载失败");
+        }
+        return;
+      }
+
+      if (isJiangxi) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesJiangxi();
+        setLevel1SourceLink();
+        setStatus("加载江西栏目（考试动态/通知公告/常见问答）…");
+        try {
+          const payload = await jget("/api/test/jiangxi/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到江西栏目，请检查官网结构是否变更。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("江西栏目为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("江西栏目已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">江西栏目请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("江西加载失败");
+        }
+        return;
+      }
+
+      if (isHubei) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesHubei();
+        setLevel1SourceLink();
+        setStatus("加载湖北栏目（自学考试/社会助学/考籍管理/自考考务/自考计划）…");
+        try {
+          const payload = await jget("/api/test/hubei/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到湖北栏目，请检查官网结构是否变更。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("湖北栏目为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("湖北栏目已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">湖北栏目请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("湖北加载失败");
+        }
+        return;
+      }
+
+      if (isHunan) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesHunan();
+        setLevel1SourceLink();
+        setStatus("加载湖南栏目…");
+        try {
+          const payload = await jget("/api/test/hunan/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到湖南栏目，请检查官网结构是否变更。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("湖南栏目为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("湖南栏目已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">湖南栏目请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("湖南加载失败");
+        }
+        return;
+      }
+
+      if (isFujian) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesFujian();
+        setLevel1SourceLink();
+        setStatus("加载福建栏目…");
+        try {
+          const payload = await jget("/api/test/fujian/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到福建栏目，请检查官网结构是否变更。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("福建栏目为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("福建栏目已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">福建栏目请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("福建加载失败");
+        }
+        return;
+      }
+
+      if (isGuizhou) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesGuizhou();
+        setLevel1SourceLink();
+        setStatus("加载贵州栏目…");
+        try {
+          const payload = await jget("/api/test/guizhou/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到贵州栏目，请检查官网结构是否变更。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("贵州栏目为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("贵州栏目已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">贵州栏目请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("贵州加载失败");
+        }
+        return;
+      }
+
+      if (isGuangxi) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesGuangxi();
+        setLevel1SourceLink();
+        setStatus("加载广西自学考试栏目…");
+        try {
+          const payload = await jget("/api/test/guangxi/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到广西栏目，请检查官网结构是否变更。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("广西栏目为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("广西栏目已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">广西栏目请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("广西加载失败");
+        }
+        return;
+      }
+
+      if (isShanghai) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesShanghai();
+        setLevel1SourceLink();
+        setStatus("加载上海自学考试栏目…");
+        try {
+          const payload = await jget("/api/test/shmeea/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到上海栏目，请检查官网结构是否变更。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("上海栏目为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("上海栏目已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">上海栏目请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("上海加载失败");
+        }
+        return;
+      }
+
+      if (isAnhui) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesAnhui();
+        setLevel1SourceLink();
+        setStatus("加载安徽栏目…");
+        try {
+          const payload = await jget("/api/test/anhui/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到安徽栏目，请检查官网结构是否变更。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("安徽栏目为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("安徽栏目已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">安徽栏目请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("安徽加载失败");
+        }
+        return;
+      }
+
+      if (isGuangdong2) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesGuangdong2();
+        setLevel1SourceLink();
+        setStatus("加载广东2 栏目…");
+        try {
+          const payload = await jget("/api/test/guangdong2/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到广东2 栏目，请检查官网结构是否变更。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("广东2 栏目为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("广东2 栏目已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">广东2 栏目请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("广东2 加载失败");
+        }
+        return;
+      }
+
+      if (isGuangdong1) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesGuangdong1();
+        setLevel1SourceLink();
+        setStatus("加载广东1 自学考试栏目…");
+        try {
+          const payload = await jget("/api/test/guangdong1/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到广东1 自学考试栏目，请检查官网结构是否变更。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("广东1 栏目为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("广东1 自学考试栏目已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">广东1 栏目请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("广东1 加载失败");
+        }
+        return;
+      }
+
+      if (isHlj) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesHeilongjiang();
+        setLevel1SourceLink();
+        setStatus("加载黑龙江自考频道…");
+        try {
+          const payload = await jget("/api/test/heilongjiang/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到黑龙江自考栏目，请检查官网结构是否变更。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("黑龙江自考栏目为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("黑龙江自考频道已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">黑龙江自考频道请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("黑龙江加载失败");
+        }
+        return;
+      }
+
+      if (isJs) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesJiangsu();
+        setLevel1SourceLink();
+        setStatus("加载江苏自学考试栏目…");
+        try {
+          const payload = await jget("/api/test/jiangsu/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到江苏栏目，请检查官网结构是否变更。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("江苏栏目为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("江苏栏目已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">江苏栏目请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("江苏加载失败");
+        }
+        return;
+      }
+
+      if (isGansu2Kw) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesGansu2Kw();
+        setLevel1SourceLink();
+        setStatus("加载甘肃2 网报 public-info …");
+        try {
+          const payload = await jget("/api/test/gansu2/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到甘肃2 板块，请检查官网或 Playwright 配置。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("甘肃2 板块为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("甘肃2 public-info 已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">甘肃2 请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("甘肃2 加载失败");
+        }
+        return;
+      }
+
+      if (isGansuPortal) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesGansuPortal();
+        setLevel1SourceLink();
+        setStatus("加载甘肃自考门户…");
+        try {
+          const payload = await jget("/api/test/gansu/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到甘肃自考栏目，请检查官网结构是否变更。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("甘肃自考栏目为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("甘肃自考门户已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">甘肃自考门户请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("甘肃加载失败");
+        }
+        return;
+      }
+
+      if (isXj) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesXinjiang();
+        setLevel1SourceLink();
+        setStatus("加载新疆官网板块…");
+        try {
+          const payload = await jget("/api/test/xinjiang/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到新疆一级板块，请检查官网结构是否变更。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("新疆板块为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("新疆板块已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">新疆板块请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("新疆板块加载失败");
+        }
+        return;
+      }
+
+      if (isXz) {
+        level3ArticleApi = "/api/test/page/content";
+        setPanelTitlesXizang();
+        setLevel1SourceLink();
+        setStatus("加载西藏官网板块…");
+        try {
+          const payload = await jget("/api/test/xizang/levels");
+          if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+          setLevel1SourceLink(payload.source_url);
+          const blocks = payload.level1 || [];
+          if (!blocks.length) {
+            level1Box.innerHTML =
+              '<div class="meta">未解析到西藏一级板块，请检查官网结构是否变更。</div>';
+            appendScoreQueryEntry();
+            level2Box.innerHTML = "";
+            level3Meta.textContent = "无列表数据";
+            level3Content.textContent = "暂无内容";
+            setStatus("西藏板块为空");
+            return;
+          }
+          renderLevel1(blocks);
+          setStatus("西藏板块已加载");
+        } catch (err) {
+          console.error(err);
+          level1Box.innerHTML =
+            '<div class="meta error">西藏板块请求失败：' +
+            escapeHtml(err.message || String(err)) +
+            "</div>";
+          appendScoreQueryEntry();
+          level2Box.innerHTML = "";
+          setStatus("西藏板块加载失败");
+        }
+        return;
+      }
+
+      if (!isSc) {
+        await loadDbSectionsAndContents(seq, pid);
+        return;
+      }
+
+      setPanelTitlesSichuan();
+      setLevel1SourceLink();
+      setStatus("加载四川板块中...");
+      const payload = await jget("/api/test/sichuan/levels");
+      if (seq !== uiLoadSeq || selectedProvinceId !== pid) return;
+      setLevel1SourceLink(payload.source_url);
+      renderLevel1(payload.level1 || []);
+      setStatus("四川板块已加载");
+    }
+
+    async function loadLevel3(url, title) {
+      setStatus("抓取三级内容中...");
+
+      const safeTitle = escapeHtml(title || "");
+      const safeUrl = escapeHtml(url || "");
+      level3Meta.innerHTML = `标题：${safeTitle}<a class="meta-link-btn" href="${safeUrl}" target="_blank" rel="noopener noreferrer">查看原网址</a>`;
+
+      const payload = await jget(`${level3ArticleApi}?url=${encodeURIComponent(url)}`);
+      if (!payload.ok) {
+        level3Content.textContent = "抓取失败: " + (payload.error || "unknown");
+      } else {
+        level3Content.textContent = payload.content_preview || payload.content_text || "空内容";
+      }
+
+      setStatus("三级内容已加载");
+    }
+
+    function openReportDialog(title, bodyText) {
+      const overlay = document.getElementById("reportDialog");
+      document.getElementById("reportDialogTitle").textContent = title;
+      document.getElementById("reportDialogBody").textContent = bodyText;
+      overlay.hidden = false;
+      document.getElementById("reportDialogClose").focus();
+    }
+
+    function closeReportDialog() {
+      document.getElementById("reportDialog").hidden = true;
+    }
+
+    function openWeeklyCrawlerDialog() {
+      document.getElementById("weeklyCrawlerDialog").hidden = false;
+      document.getElementById("weeklyCrawlerDialogClose").focus();
+    }
+
+    function closeWeeklyCrawlerDialog() {
+      document.getElementById("weeklyCrawlerDialog").hidden = true;
+    }
+
+    function setWeeklyCrawlerProgress(done, total) {
+      const safeTotal = Math.max(1, total || 1);
+      const pct = Math.min(100, Math.round((done / safeTotal) * 100));
+      document.getElementById("weeklyCrawlerProgressFill").style.width = pct + "%";
+      document.getElementById("weeklyCrawlerProgressText").textContent =
+        `查询进度：${done}/${total}（${pct}%）`;
+    }
+
+    function formatDateText(value) {
+      if (!value) return "-";
+      const d = new Date(value);
+      if (Number.isNaN(d.getTime())) return String(value);
+      return d.toLocaleString("zh-CN", { hour12: false });
+    }
+
+    function parseDateLike(value) {
+      const text = String(value || "").trim();
+      if (!text) return null;
+      const normalized = text.replace(/\./g, "-").replace(/\//g, "-");
+      let m = normalized.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+      if (!m) m = text.match(/(\d{4})年(\d{1,2})月(\d{1,2})日?/);
+      if (!m) return null;
+      const y = Number(m[1]);
+      const mo = Number(m[2]);
+      const d = Number(m[3]);
+      const dt = new Date(y, mo - 1, d, 0, 0, 0, 0);
+      return Number.isNaN(dt.getTime()) ? null : dt;
+    }
+
+    function getCachedJsonByUrl(url) {
+      const full = apiUrl(url);
+      const key = full + "||{}";
+      if (jgetCache.has(key)) return jgetCache.get(key);
+      for (const [k, v] of jgetCache.entries()) {
+        if (k.startsWith(full + "||")) return v;
+      }
+      return null;
+    }
+
+    function collectWeekItemsFromCachedPayload(pid, provinceName, payload, nowTs) {
+      const rows = [];
+      const weekAgoTs = nowTs - 7 * 24 * 3600 * 1000;
+      const level1 = Array.isArray(payload && payload.level1) ? payload.level1 : [];
+      level1.forEach(group => {
+        const sectionName = String((group && group.name) || "");
+        const items = Array.isArray(group && group.items) ? group.items : [];
+        items.forEach(item => {
+          const dt = parseDateLike(item && item.publish_date);
+          if (!dt) return;
+          const ts = dt.getTime();
+          if (ts < weekAgoTs || ts > nowTs + 24 * 3600 * 1000) return;
+          rows.push({
+            province_id: pid,
+            province: provinceName,
+            section: sectionName || "-",
+            title: String((item && item.title) || "(无标题)"),
+            url: String((item && item.url) || ""),
+            publish_date: String((item && item.publish_date) || ""),
+            sort_ts: ts,
+          });
+        });
+      });
+      return rows;
+    }
+
+    function renderWeeklyCrawlerResult(allItems) {
+      const box = document.getElementById("weeklyCrawlerResultBody");
+      if (!allItems.length) {
+        box.innerHTML = '<div class="weekly-empty">缓存中近一周暂无带日期的二级板块记录。</div>';
+        return;
+      }
+      const lines = allItems.map(item => {
+        const when = formatDateText(item.publish_date);
+        const province = escapeHtml(item.province || "-");
+        const section = escapeHtml(item.section || "-");
+        const title = escapeHtml(item.title || "(无标题)");
+        const url = escapeHtml(item.url || "");
+        return `<li>[${when}] ${province} / ${section}<br>${title}${url ? ` <a class="link" href="${url}" target="_blank" rel="noopener noreferrer">查看</a>` : ""}</li>`;
+      });
+      box.innerHTML = `<ol class="weekly-result-list">${lines.join("")}</ol>`;
+    }
+
+    async function loadWeeklyCrawlerInfo() {
+      openWeeklyCrawlerDialog();
+      const resultBody = document.getElementById("weeklyCrawlerResultBody");
+      resultBody.innerHTML = '<div class="weekly-empty">正在扫描缓存中的二级板块日期…</div>';
+      try {
+        const provinces = await jget("/api/provinces");
+        const total = provinces.length;
+        let done = 0;
+        const allItems = [];
+        const nowTs = Date.now();
+        setWeeklyCrawlerProgress(0, total);
+        for (const p of provinces) {
+          const pid = p.id;
+          const pname = p.name || "";
+          try {
+            // 特殊站点：读取缓存的 /api/test/*/levels
+            const endpoint = resolveSpecialLevelsEndpoint(pid);
+            if (endpoint) {
+              const payload = getCachedJsonByUrl(endpoint);
+              if (payload) {
+                allItems.push(...collectWeekItemsFromCachedPayload(pid, pname, payload, nowTs));
+              }
+            } else {
+              // 普通站点：读取缓存 sections + contents 列表中的 publish_date
+              const sections = getCachedJsonByUrl(`/api/provinces/${pid}/sections`);
+              const secRows = Array.isArray(sections) ? sections : [];
+              for (const sec of secRows) {
+                const contentPayload = getCachedJsonByUrl(`/api/sections/${sec.id}/contents?page=1&page_size=50`);
+                const rows = Array.isArray(contentPayload && contentPayload.data)
+                  ? contentPayload.data
+                  : [];
+                rows.forEach(item => {
+                  const dt = parseDateLike(item && item.publish_date);
+                  if (!dt) return;
+                  const ts = dt.getTime();
+                  if (ts < nowTs - 7 * 24 * 3600 * 1000 || ts > nowTs + 24 * 3600 * 1000) return;
+                  allItems.push({
+                    province_id: pid,
+                    province: pname,
+                    section: String((sec && sec.name) || "-"),
+                    title: String((item && item.title) || "(无标题)"),
+                    url: String((item && item.url) || ""),
+                    publish_date: String((item && item.publish_date) || ""),
+                    sort_ts: ts,
+                  });
+                });
+              }
+            }
+          } catch (_) {
+            // 缓存缺失或结构不符时忽略该省
+          }
+          done += 1;
+          setWeeklyCrawlerProgress(done, total);
+        }
+        allItems.sort((a, b) => b.sort_ts - a.sort_ts);
+        renderWeeklyCrawlerResult(allItems);
+      } catch (err) {
+        const msg = err && err.message ? err.message : String(err);
+        resultBody.innerHTML = `<div class="weekly-empty">查询失败：${escapeHtml(msg)}</div>`;
+      }
+    }
+
+    /** 页内模态框（避免部分环境屏蔽 window.alert）；加载最新报告摘要并刷新板块 */
+    async function showLatestReportDialog(triggerJobId) {
+      setStatus("加载更新报告中...");
+      let payload;
+      try {
+        payload = await jget("/api/crawl/report-latest");
+      } catch (err) {
+        const msg = err && err.message ? err.message : String(err);
+        openReportDialog("加载报告失败", msg);
+        setStatus("报告加载失败");
+        return;
+      }
+      const s = payload.summary || {};
+      let body = "";
+      if (triggerJobId != null && triggerJobId !== undefined) {
+        body += `已提交刷新任务，job_id=${triggerJobId}\nprovince_id=${selectedProvinceId}\n\n`;
+      }
+      body +=
+        `总更新: ${s.total_updates ?? 0}\n` +
+        `新增: ${s.new_count ?? 0}\n` +
+        `修改: ${s.modified_count ?? 0}\n` +
+        `删除: ${s.deleted_count ?? 0}`;
+      openReportDialog("更新报告", body);
+      setStatus("更新报告已加载");
+      try {
+        await loadLevelData();
+      } catch (_) {
+        /* 列表刷新失败不挡弹窗 */
+      }
+    }
+
+    async function refreshProvince() {
+      setStatus("触发刷新任务...");
+      try {
+        const payload = await jpost("/api/crawl/trigger", {
+          type: "province",
+          province_id: selectedProvinceId,
+        });
+        setStatus(`刷新任务已触发 job_id=${payload.id}，加载报告中…`);
+        await showLatestReportDialog(payload.id);
+      } catch (err) {
+        const msg = err && err.message ? err.message : String(err);
+        setStatus("刷新失败");
+        openReportDialog("刷新失败", msg + "\n\n请确认服务已启动。");
+      }
+    }
+
+    async function copyChatPlainText(plain, btn) {
+      const t = String(plain ?? "");
+      if (!t) return;
+      try {
+        await navigator.clipboard.writeText(t);
+        const prev = btn.textContent;
+        btn.textContent = "已复制";
+        setTimeout(() => {
+          btn.textContent = prev;
+        }, 1600);
+      } catch (e) {
+        alert("复制失败，请手动选中气泡内文字复制。");
+      }
+    }
+
+    function appendChatBubble(role, text) {
+      const wrap = document.createElement("div");
+      wrap.className = "chat-msg " + (role === "user" ? "user" : "assistant");
+      const head = document.createElement("div");
+      head.className = "chat-msg-head";
+      const label = document.createElement("span");
+      label.className = "role-label";
+      label.textContent = role === "user" ? "你" : "助手";
+      const copyBtn = document.createElement("button");
+      copyBtn.type = "button";
+      copyBtn.className = "chat-copy-btn";
+      copyBtn.textContent = "复制";
+      copyBtn.addEventListener("click", () => copyChatPlainText(text, copyBtn));
+      head.appendChild(label);
+      head.appendChild(copyBtn);
+      const bubble = document.createElement("div");
+      bubble.className = "bubble";
+      bubble.textContent = text;
+      wrap.appendChild(head);
+      wrap.appendChild(bubble);
+      chatLog.appendChild(wrap);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }
+
+    function clearChat() {
+      chatHistory = [];
+      chatLog.innerHTML = "";
+      chatMeta.textContent =
+        "对话已清空。需在环境变量中配置 OPENAI_API_KEY 或 DEEPSEEK_API_KEY。";
+    }
+
+    async function sendChatMessage() {
+      const text = chatInput.value.trim();
+      if (!text) return;
+      chatInput.value = "";
+      appendChatBubble("user", text);
+      const toSend = chatHistory.concat([{ role: "user", content: text }]);
+      setStatus("AI 回复中…");
+      chatMeta.textContent = "正在请求模型…";
+      try {
+        const payload = await jpostChat({ messages: toSend });
+        if (!payload.ok) {
+          chatLog.removeChild(chatLog.lastChild);
+          chatMeta.textContent = payload.error || "调用失败";
+          alert(payload.error || "调用失败");
+          return;
+        }
+        chatHistory.push({ role: "user", content: text });
+        chatHistory.push({ role: "assistant", content: payload.reply });
+        appendChatBubble("assistant", payload.reply);
+        const rounds = Math.floor(chatHistory.length / 2);
+        chatMeta.textContent = `已进行 ${rounds} 轮对话（与省份选择无关）`;
+      } catch (err) {
+        if (chatLog.lastChild) chatLog.removeChild(chatLog.lastChild);
+        chatMeta.textContent = "请求失败";
+        const msg = err.message || String(err);
+        alert(
+          msg +
+            (msg.indexOf("404") !== -1
+              ? "\n\n若持续 404：请在本机停止旧 uvicorn 后重新执行：python -m uvicorn app.main:app --host 127.0.0.1 --port 8001"
+              : "")
+        );
+      }
+      setStatus("就绪");
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function extractLevel3Title() {
+      const raw = (level3Meta.textContent || "").replace(/\s+/g, " ").trim();
+      if (raw.startsWith("标题：")) {
+        let t = raw.slice(3).trim();
+        const idx = t.indexOf("[查看原网址]");
+        if (idx !== -1) t = t.slice(0, idx).trim();
+        return t;
+      }
+      return "";
+    }
+
+    function formatPolicySummaryHtml(text) {
+      return escapeHtml(String(text)).replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+    }
+
+    function appendPolicySummaryAssistant(replyText) {
+      const plain = String(replyText ?? "");
+      const wrap = document.createElement("div");
+      wrap.className = "chat-msg assistant";
+      const head = document.createElement("div");
+      head.className = "chat-msg-head";
+      const label = document.createElement("span");
+      label.className = "role-label";
+      label.textContent = "助手（政策整理）";
+      const copyBtn = document.createElement("button");
+      copyBtn.type = "button";
+      copyBtn.className = "chat-copy-btn";
+      copyBtn.textContent = "复制";
+      copyBtn.addEventListener("click", () => copyChatPlainText(plain, copyBtn));
+      head.appendChild(label);
+      head.appendChild(copyBtn);
+      const bubble = document.createElement("div");
+      bubble.className = "bubble";
+      bubble.innerHTML = formatPolicySummaryHtml(replyText);
+      wrap.appendChild(head);
+      wrap.appendChild(bubble);
+      chatLog.appendChild(wrap);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }
+
+    async function summarizeLevel3Policy() {
+      const btn = document.getElementById("summarizePolicyBtn");
+      const text = (level3Content.textContent || "").trim();
+      if (
+        !text ||
+        text === "暂无内容" ||
+        text === "空内容" ||
+        text.startsWith("抓取失败")
+      ) {
+        alert("请先在第三板块加载有效正文后再试。");
+        return;
+      }
+      const title = extractLevel3Title();
+      if (btn) btn.disabled = true;
+      setStatus("政策整理中…");
+      chatMeta.textContent = "正在根据第三板块正文生成政策整理…";
+      appendChatBubble("user", "【政策整理】已根据第三板块正文发起总结");
+      const loadingWrap = document.createElement("div");
+      loadingWrap.className = "chat-msg assistant";
+      loadingWrap.innerHTML =
+        '<div class="role-label">助手（政策整理）</div><div class="bubble">整理中…</div>';
+      chatLog.appendChild(loadingWrap);
+      chatLog.scrollTop = chatLog.scrollHeight;
+      try {
+        const payload = await jpost("/api/test/summarize-policy", {
+          content: text,
+          title: title || undefined,
+        });
+        chatLog.removeChild(loadingWrap);
+        if (!payload.ok) {
+          if (chatLog.lastChild) chatLog.removeChild(chatLog.lastChild);
+          chatMeta.textContent = payload.error || "政策整理失败";
+          alert(payload.error || "调用失败");
+          return;
+        }
+        appendPolicySummaryAssistant(payload.reply);
+        chatMeta.textContent =
+          "政策整理已显示在下方；多轮对话历史未写入正文全文，可继续普通对话。";
+      } catch (err) {
+        if (loadingWrap.parentNode) chatLog.removeChild(loadingWrap);
+        if (chatLog.lastChild) chatLog.removeChild(chatLog.lastChild);
+        chatMeta.textContent = "政策整理请求失败";
+        const msg = err.message || String(err);
+        alert(
+          msg +
+            (msg.indexOf("404") !== -1
+              ? "\n\n请确认服务已重启并包含接口 /api/test/summarize-policy"
+              : "")
+        );
+      } finally {
+        if (btn) btn.disabled = false;
+        setStatus("就绪");
+      }
+    }
+
+    provinceSelect.onchange = async () => {
+      selectedProvinceId = Number(provinceSelect.value || "1");
+      const opt = provinceSelect.options[provinceSelect.selectedIndex];
+      selectedProvinceName = opt ? opt.textContent : "";
+      await loadLevelData();
+      chatMeta.textContent =
+        `当前省份: ${selectedProvinceName}（id=${selectedProvinceId}）· 右侧 AI 对话与省份无关`;
+    };
+
+    document.getElementById("refreshProvinceBtn").onclick = refreshProvince;
+    document.getElementById("preloadCrawlerBtn").onclick = preloadAllProvincesL12;
+    document.getElementById("weeklyCrawlerInfoBtn").onclick = loadWeeklyCrawlerInfo;
+
+    (function initReportDialogUi() {
+      const overlay = document.getElementById("reportDialog");
+      const panel = overlay.querySelector(".modal-panel");
+      document.getElementById("reportDialogClose").onclick = closeReportDialog;
+      overlay.addEventListener("click", e => {
+        if (e.target === overlay) closeReportDialog();
+      });
+      panel.addEventListener("click", e => e.stopPropagation());
+      document.addEventListener("keydown", e => {
+        if (e.key === "Escape" && !overlay.hidden) closeReportDialog();
+      });
+    })();
+    (function initWeeklyCrawlerDialogUi() {
+      const overlay = document.getElementById("weeklyCrawlerDialog");
+      const panel = overlay.querySelector(".modal-panel");
+      document.getElementById("weeklyCrawlerDialogClose").onclick = closeWeeklyCrawlerDialog;
+      overlay.addEventListener("click", e => {
+        if (e.target === overlay) closeWeeklyCrawlerDialog();
+      });
+      panel.addEventListener("click", e => e.stopPropagation());
+      document.addEventListener("keydown", e => {
+        if (e.key === "Escape" && !overlay.hidden) closeWeeklyCrawlerDialog();
+      });
+    })();
+    (function initPreloadCrawlerDialogUi() {
+      const overlay = document.getElementById("preloadCrawlerDialog");
+      const panel = overlay.querySelector(".modal-panel");
+      document.getElementById("preloadCrawlerDialogClose").onclick = closePreloadCrawlerDialog;
+      overlay.addEventListener("click", e => {
+        if (e.target === overlay) closePreloadCrawlerDialog();
+      });
+      panel.addEventListener("click", e => e.stopPropagation());
+      document.addEventListener("keydown", e => {
+        if (e.key === "Escape" && !overlay.hidden) closePreloadCrawlerDialog();
+      });
+    })();
+    document.getElementById("chatSendBtn").onclick = sendChatMessage;
+    document.getElementById("chatClearBtn").onclick = clearChat;
+    document.getElementById("summarizePolicyBtn").onclick = summarizeLevel3Policy;
+    chatInput.addEventListener("keydown", e => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendChatMessage();
+      }
+    });
+
+    async function init() {
+      try {
+        await loadProvinces();
+        await loadLevelData();
+        chatMeta.textContent =
+          `当前省份: ${selectedProvinceName}（id=${selectedProvinceId}）· 右侧 AI 对话与省份无关`;
+        // 页面进入后静默预热，不打断用户当前操作
+        preloadAllProvincesL12({ silent: true });
+      } catch (err) {
+        setStatus("加载失败");
+        console.error(err);
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
+
+
