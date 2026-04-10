@@ -22,6 +22,10 @@ uv venv .venv --python 3.12
 
 uv sync
 ```
+然后，执行后端启动命令：
+```
+uv run python main.py
+```
 
 # 填写环境变量
 将 env.example 文件复制一份并命名为 .env，然后根据实际情况修改其中的环境变量值。
