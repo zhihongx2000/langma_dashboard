@@ -1,8 +1,8 @@
-﻿from openai import OpenAI
-from sqlalchemy import select
+﻿from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
+from app.llm_openai_client import get_openai_compatible_client
 from app.models.content import Content
 from app.models.section import Section
 
@@ -46,7 +46,7 @@ def answer_from_crawled_content(db: Session, question: str, province_id: int = 1
     related = _pick_related(rows, query, limit=10)
     context_items = related if related else rows[:10]
 
-    if not settings.deepseek_api_key:
+    if get_openai_compatible_client() is None:
         return {
             "ok": True,
             "mode": "rule_fallback",
@@ -62,10 +62,9 @@ def answer_from_crawled_content(db: Session, question: str, province_id: int = 1
         )
 
     try:
-        client = OpenAI(
-            api_key=settings.deepseek_api_key,
-            base_url=(settings.deepseek_api_base_url or "https://api.deepseek.com/v1").rstrip("/"),
-        )
+        client = get_openai_compatible_client()
+        if client is None:
+            raise RuntimeError("no_llm_credentials")
         resp = client.chat.completions.create(
             model=settings.ai_search_model,
             messages=[

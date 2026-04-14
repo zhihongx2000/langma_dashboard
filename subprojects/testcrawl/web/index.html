@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>本地测试UI - 四川四级面板</title>
+  <title>考试信息收集工具 - 朗玛峰 AI 工作台</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -212,22 +212,18 @@
     }
     .inner { padding: 14px 16px; }
 
-    .panel::-webkit-scrollbar,
-    .chat-log::-webkit-scrollbar {
+    .panel::-webkit-scrollbar {
       width: 6px;
       height: 6px;
     }
-    .panel::-webkit-scrollbar-track,
-    .chat-log::-webkit-scrollbar-track {
+    .panel::-webkit-scrollbar-track {
       background: transparent;
     }
-    .panel::-webkit-scrollbar-thumb,
-    .chat-log::-webkit-scrollbar-thumb {
+    .panel::-webkit-scrollbar-thumb {
       background: var(--color-outline-variant);
       border-radius: 10px;
     }
-    .panel::-webkit-scrollbar-thumb:hover,
-    .chat-log::-webkit-scrollbar-thumb:hover {
+    .panel::-webkit-scrollbar-thumb:hover {
       background: var(--color-outline);
     }
 
@@ -600,10 +596,9 @@
   <div class="app-shell">
   <div class="topbar">
     <span class="topbar-brand">朗玛峰 AI 工作台</span>
-    <span class="env-tag">本地测试</span>
+    <span class="env-tag">正式版</span>
     <label for="provinceSelect"><strong>省份：</strong></label>
     <select id="provinceSelect"></select>
-    <button id="refreshProvinceBtn" class="primary">刷新当前省份</button>
     <button id="preloadCrawlerBtn" type="button">爬虫加载</button>
     <button id="weeklyCrawlerInfoBtn" type="button">近一周爬虫信息</button>
     <span class="status" id="statusText">就绪</span>
@@ -612,7 +607,7 @@
   <div class="grid">
     <section class="panel">
       <div class="panel-head">
-        <h3 id="panel1Title">1级板块（一级）</h3>
+        <h3 id="panel1Title">栏目导航</h3>
         <a id="scoreQueryLink" class="link level1-source-link" href="#" target="_blank" rel="noopener noreferrer" hidden>成绩查询</a>
         <a id="level1SourceLink" class="link level1-source-link" href="#" target="_blank" rel="noopener noreferrer" hidden>查看原网址</a>
       </div>
@@ -620,27 +615,25 @@
     </section>
 
     <section class="panel">
-      <h3 id="panel2Title">2级板块（二级，右侧为发布日期）</h3>
+      <h3 id="panel2Title">资讯列表</h3>
       <div class="inner" id="level2Box"></div>
     </section>
 
     <section class="panel">
       <div class="panel-head">
-        <h3 id="panel3Title">3级板块（内容爬取）</h3>
+        <h3 id="panel3Title">正文详情</h3>
         <button type="button" id="summarizePolicyBtn" class="primary">AI总结</button>
       </div>
       <div class="inner">
-        <div class="meta" id="level3Meta">请选择二级板块条目</div>
+        <div class="meta" id="level3Meta">请选择一条资讯查看正文详情</div>
         <pre id="level3Content">暂无内容</pre>
       </div>
     </section>
 
     <section class="panel">
-      <h3>4级板块（AI 对话）</h3>
+      <h3 id="panel4Title">AI总结助手</h3>
       <div class="inner chat-panel-inner">
-        <div class="meta" id="chatMeta">
-          普通多轮对话，与左侧省份栏目无关。需在环境变量中配置 OPENAI_API_KEY（及可选 OPENAI_BASE_URL）或 DEEPSEEK_API_KEY。
-        </div>
+        <div class="meta" id="chatMeta">普通多轮对话，与左侧省份栏目无关。</div>
         <div class="chat-log" id="chatLog"></div>
         <div class="search-row">
           <input id="chatInput" placeholder="输入消息，回车或点发送…" />
@@ -701,12 +694,12 @@
     const chatMeta = document.getElementById("chatMeta");
     const chatLog = document.getElementById("chatLog");
     const chatInput = document.getElementById("chatInput");
-    let chatHistory = [];
     const provinceSelect = document.getElementById("provinceSelect");
     const panel1Title = document.getElementById("panel1Title");
     const panel2Title = document.getElementById("panel2Title");
     const panel3Title = document.getElementById("panel3Title");
 
+    let chatHistory = [];
     let selectedProvinceId = 1;
     let selectedProvinceName = "";
     let scoreQueryUrl = null;
@@ -734,226 +727,158 @@
       }
     }
 
+    function applyPanelTitles(regionLabel, navLabel, listLabel = "资讯列表", detailLabel = "正文详情") {
+      panel1Title.textContent = `${regionLabel}栏目导航${navLabel ? ` · ${navLabel}` : ""}`;
+      panel2Title.textContent = `${regionLabel}${listLabel}`;
+      panel3Title.textContent = `${regionLabel}${detailLabel}`;
+    }
+
     function setPanelTitlesSichuan() {
-      panel1Title.textContent = "1级板块（四川官网 · 一级）";
-      panel2Title.textContent = "2级板块（四川官网 · 二级列表）";
-      panel3Title.textContent = "3级板块（四川官网 · 正文抓取）";
+      applyPanelTitles("四川", "官网栏目", "资讯列表", "正文详情");
     }
 
     function setPanelTitlesDb() {
-      panel1Title.textContent = "1级板块（已入库栏目）";
-      panel2Title.textContent = "2级板块（已入库文章）";
-      panel3Title.textContent = "3级板块（正文预览）";
+      applyPanelTitles("已采集", "栏目", "资讯列表", "正文预览");
     }
 
     function setPanelTitlesHeilongjiang() {
-      panel1Title.textContent = "1级板块（黑龙江 · 自考频道 · 二级栏目）";
-      panel2Title.textContent = "2级板块（黑龙江 · 文章列表）";
-      panel3Title.textContent = "3级板块（黑龙江 · 正文抓取）";
+      applyPanelTitles("黑龙江", "自考频道", "资讯列表", "正文详情");
     }
 
     function setPanelTitlesJiangsu() {
-      panel1Title.textContent = "1级板块（江苏 · 分组前缀与子栏目用「-」连接）";
-      panel2Title.textContent = "2级板块（江苏 · 列表）";
-      panel3Title.textContent = "3级板块（江苏 · 正文抓取）";
+      applyPanelTitles("江苏", "专题分组与子栏目", "资讯列表", "正文详情");
     }
 
     function setPanelTitlesGansuPortal() {
-      panel1Title.textContent = "1级板块（甘肃自考门户 · 通知公告 / 政策规定）";
-      panel2Title.textContent = "2级板块（甘肃 · 列表）";
-      panel3Title.textContent = "3级板块（甘肃 · 正文抓取）";
+      applyPanelTitles("甘肃", "通知公告与政策规定", "资讯列表", "正文详情");
     }
 
     function setPanelTitlesGansu2Kw() {
-      panel1Title.textContent = "1级板块（甘肃2 · 网报 public-info · 101.md 一级板块）";
-      panel2Title.textContent = "2级板块（甘肃2 · 表格行 / 说明）";
-      panel3Title.textContent = "3级板块（整页 HTML 摘要；表格行多为站内入口）";
+      applyPanelTitles("甘肃报名平台", "公开信息栏目", "信息列表", "页面详情");
     }
 
     function setPanelTitlesHainan() {
-      panel1Title.textContent = "1级板块（海南 · 自学考试）";
-      panel2Title.textContent = "2级板块（海南 · 列表）";
-      panel3Title.textContent = "3级板块（海南 · 正文抓取）";
+      applyPanelTitles("海南", "自学考试", "资讯列表", "正文详情");
     }
 
     function setPanelTitlesQinghai() {
-      panel1Title.textContent = "1级板块（青海 · 自学考试）";
-      panel2Title.textContent = "2级板块（青海 · 列表）";
-      panel3Title.textContent = "3级板块（青海 · 正文抓取）";
+      applyPanelTitles("青海", "自学考试", "资讯列表", "正文详情");
     }
 
     function setPanelTitlesNeimenggu1() {
-      panel1Title.textContent = "1级板块（内蒙古1 · 公告栏 / 政策规定）";
-      panel2Title.textContent = "2级板块（内蒙古1 · 列表）";
-      panel3Title.textContent = "3级板块（内蒙古1 · 正文抓取）";
+      applyPanelTitles("内蒙古", "公告栏与政策规定", "资讯列表", "正文详情");
     }
 
     function setPanelTitlesNeimenggu2() {
-      panel1Title.textContent = "1级板块（内蒙古2 · 自考公告 / 政策规定 / 主考学校公告栏）";
-      panel2Title.textContent = "2级板块（内蒙古2 · 列表）";
-      panel3Title.textContent = "3级板块（内蒙古2 · 正文抓取）";
+      applyPanelTitles("内蒙古服务平台", "公告与主考学校资讯", "资讯列表", "正文详情");
     }
 
     function setPanelTitlesHenan1() {
-      panel1Title.textContent = "1级板块（河南1 · 自学考试）";
-      panel2Title.textContent = "2级板块（河南1 · 列表/占位）";
-      panel3Title.textContent = "3级板块（河南1 · 正文抓取）";
+      applyPanelTitles("河南", "自学考试", "资讯列表", "正文详情");
     }
 
     function setPanelTitlesHenan2() {
-      panel1Title.textContent = "1级板块（河南2 · 时间安排 / 政策·公告）";
-      panel2Title.textContent = "2级板块（河南2 · 关键词检索结果 / 列表）";
-      panel3Title.textContent = "3级板块（河南2 · 正文抓取）";
+      applyPanelTitles("河南考试安排", "时间安排与政策公告", "检索结果", "正文详情");
     }
 
     function setPanelTitlesJilin() {
-      panel1Title.textContent = "1级板块（吉林 · 通知公告 / 政策法规 / 常见问答）";
-      panel2Title.textContent = "2级板块（吉林 · 列表）";
-      panel3Title.textContent = "3级板块（吉林 · 正文抓取）";
+      applyPanelTitles("吉林", "通知公告与政策法规", "资讯列表", "正文详情");
     }
 
     function setPanelTitlesNingxia() {
-      panel1Title.textContent = "1级板块（宁夏 · 高等教育自学考试）";
-      panel2Title.textContent = "2级板块（宁夏 · 列表）";
-      panel3Title.textContent = "3级板块（宁夏 · 正文抓取）";
+      applyPanelTitles("宁夏", "高等教育自学考试", "资讯列表", "正文详情");
     }
 
     function setPanelTitlesYunnan() {
-      panel1Title.textContent = "1级板块（云南 · 自学考试）";
-      panel2Title.textContent = "2级板块（云南 · 列表）";
-      panel3Title.textContent = "3级板块（云南 · 正文抓取）";
+      applyPanelTitles("云南", "自学考试", "资讯列表", "正文详情");
     }
 
     function setPanelTitlesBeijing() {
-      panel1Title.textContent = "1级板块（北京 · 信息发布台/自考政策/近期业务/快速通道/必备知识）";
-      panel2Title.textContent = "2级板块（北京 · 列表）";
-      panel3Title.textContent = "3级板块（北京 · 正文抓取）";
+      applyPanelTitles("北京", "信息发布与业务服务", "资讯列表", "正文详情");
     }
 
     function setPanelTitlesZhejiang() {
-      panel1Title.textContent = "1级板块（浙江 · 最新消息/政策文件/专业计划/考试报名/转考免考/毕业办理）";
-      panel2Title.textContent = "2级板块（浙江 · 列表）";
-      panel3Title.textContent = "3级板块（浙江 · 正文抓取）";
+      applyPanelTitles("浙江", "最新消息与业务办理", "资讯列表", "正文详情");
     }
 
     function setPanelTitlesTianjin() {
-      panel1Title.textContent = "1级板块（天津 · 自学考试/自考考生服务平台/重要提示/自考指南/信息查询/咨询渠道）";
-      panel2Title.textContent = "2级板块（天津 · 列表）";
-      panel3Title.textContent = "3级板块（天津 · 正文抓取）";
+      applyPanelTitles("天津", "考试服务与重要提示", "资讯列表", "正文详情");
     }
 
     function setPanelTitlesHebei() {
-      panel1Title.textContent = "1级板块（河北 · 最新通知公告/查询中心/考生必读）";
-      panel2Title.textContent = "2级板块（河北 · 列表）";
-      panel3Title.textContent = "3级板块（河北 · 正文抓取）";
+      applyPanelTitles("河北", "通知公告与查询服务", "资讯列表", "正文详情");
     }
 
     function setPanelTitlesShandong() {
-      panel1Title.textContent = "1级板块（山东 · 自学考试）";
-      panel2Title.textContent = "2级板块（山东 · 列表）";
-      panel3Title.textContent = "3级板块（山东 · 正文抓取）";
+      applyPanelTitles("山东", "自学考试", "资讯列表", "正文详情");
     }
 
     function setPanelTitlesChongqing() {
-      panel1Title.textContent = "1级板块（重庆 · 自学考试）";
-      panel2Title.textContent = "2级板块（重庆 · 列表）";
-      panel3Title.textContent = "3级板块（重庆 · 正文抓取）";
+      applyPanelTitles("重庆", "自学考试", "资讯列表", "正文详情");
     }
 
     function setPanelTitlesShaanxi() {
-      panel1Title.textContent = "1级板块（陕西 · 自学考试）";
-      panel2Title.textContent = "2级板块（陕西 · 列表）";
-      panel3Title.textContent = "3级板块（陕西 · 正文抓取）";
+      applyPanelTitles("陕西", "自学考试", "资讯列表", "正文详情");
     }
 
     function setPanelTitlesShanxi() {
-      panel1Title.textContent = "1级板块（山西 · 自学考试）";
-      panel2Title.textContent = "2级板块（山西 · 列表）";
-      panel3Title.textContent = "3级板块（山西 · 正文抓取）";
+      applyPanelTitles("山西", "自学考试", "资讯列表", "正文详情");
     }
 
     function setPanelTitlesLiaoning1() {
-      panel1Title.textContent = "1级板块（辽宁1 · 自学考试）";
-      panel2Title.textContent = "2级板块（辽宁1 · 列表）";
-      panel3Title.textContent = "3级板块（辽宁1 · 正文抓取）";
+      applyPanelTitles("辽宁", "自学考试", "资讯列表", "正文详情");
     }
 
     function setPanelTitlesLiaoning2() {
-      panel1Title.textContent = "1级板块（辽宁2 · 温馨提示/政策规定/考生须知）";
-      panel2Title.textContent = "2级板块（辽宁2 · 列表）";
-      panel3Title.textContent = "3级板块（辽宁2 · 正文抓取）";
+      applyPanelTitles("辽宁服务专区", "温馨提示与考生须知", "资讯列表", "正文详情");
     }
 
     function setPanelTitlesJiangxi() {
-      panel1Title.textContent = "1级板块（江西 · 考试动态/通知公告/常见问答）";
-      panel2Title.textContent = "2级板块（江西 · 列表）";
-      panel3Title.textContent = "3级板块（江西 · 正文抓取）";
+      applyPanelTitles("江西", "考试动态与通知公告", "资讯列表", "正文详情");
     }
 
     function setPanelTitlesHubei() {
-      panel1Title.textContent = "1级板块（湖北 · 自学考试/社会助学/考籍管理/自考考务/自考计划）";
-      panel2Title.textContent = "2级板块（湖北 · 列表）";
-      panel3Title.textContent = "3级板块（湖北 · 正文抓取）";
+      applyPanelTitles("湖北", "自学考试与考务管理", "资讯列表", "正文详情");
     }
 
     function setPanelTitlesHunan() {
-      panel1Title.textContent = "1级板块（湖南 · 2026年考试日程/最新消息/通知公告/自考政策/开考课程计划/考试大纲/考试计划）";
-      panel2Title.textContent = "2级板块（湖南 · 列表）";
-      panel3Title.textContent = "3级板块（湖南 · 正文抓取）";
+      applyPanelTitles("湖南", "考试日程与政策计划", "资讯列表", "正文详情");
     }
 
     function setPanelTitlesFujian() {
-      panel1Title.textContent = "1级板块（福建 · 公示公告/自考动态/政策文件）";
-      panel2Title.textContent = "2级板块（福建 · 列表）";
-      panel3Title.textContent = "3级板块（福建 · 正文抓取）";
+      applyPanelTitles("福建", "公示公告与政策文件", "资讯列表", "正文详情");
     }
 
     function setPanelTitlesGuizhou() {
-      panel1Title.textContent = "1级板块（贵州 · 考试报名/专业计划/通知公告）";
-      panel2Title.textContent = "2级板块（贵州 · 列表）";
-      panel3Title.textContent = "3级板块（贵州 · 正文抓取）";
+      applyPanelTitles("贵州", "报名服务与专业计划", "资讯列表", "正文详情");
     }
 
     function setPanelTitlesGuangxi() {
-      panel1Title.textContent = "1级板块（广西 · 通知公告 / 招生问答 / 招考日程）";
-      panel2Title.textContent = "2级板块（广西 · 列表）";
-      panel3Title.textContent = "3级板块（广西 · 正文抓取）";
+      applyPanelTitles("广西", "通知公告与招考日程", "资讯列表", "正文详情");
     }
 
     function setPanelTitlesShanghai() {
-      panel1Title.textContent = "1级板块（上海 · 自考新闻 / 考试日程 / 政策法规 / 大纲教材）";
-      panel2Title.textContent = "2级板块（上海 · 列表）";
-      panel3Title.textContent = "3级板块（上海 · 正文抓取）";
+      applyPanelTitles("上海", "自考新闻与政策法规", "资讯列表", "正文详情");
     }
 
     function setPanelTitlesAnhui() {
-      panel1Title.textContent = "1级板块（安徽 · 自考动态/考试安排/教材版本/主考院校/政策文件/助学管理/业务办理/本科/专科）";
-      panel2Title.textContent = "2级板块（安徽 · 列表）";
-      panel3Title.textContent = "3级板块（安徽 · 正文抓取）";
+      applyPanelTitles("安徽", "动态通知与业务办理", "资讯列表", "正文详情");
     }
 
     function setPanelTitlesGuangdong1() {
-      panel1Title.textContent = "1级板块（广东1 · 自学考试）";
-      panel2Title.textContent = "2级板块（广东1 · 列表）";
-      panel3Title.textContent = "3级板块（广东1 · 正文抓取）";
+      applyPanelTitles("广东", "自学考试", "资讯列表", "正文详情");
     }
 
     function setPanelTitlesGuangdong2() {
-      panel1Title.textContent = "1级板块（广东2 · 专业计划/助学管理/考务管理/考籍管理/其他公告）";
-      panel2Title.textContent = "2级板块（广东2 · 列表）";
-      panel3Title.textContent = "3级板块（广东2 · 正文抓取）";
+      applyPanelTitles("广东服务专区", "专业计划与考籍管理", "资讯列表", "正文详情");
     }
 
     function setPanelTitlesXinjiang() {
-      panel1Title.textContent = "1级板块（新疆官网 · 通知公告 / 政策资讯）";
-      panel2Title.textContent = "2级板块（新疆官网 · 列表）";
-      panel3Title.textContent = "3级板块（新疆官网 · 正文抓取）";
+      applyPanelTitles("新疆", "通知公告与政策资讯", "资讯列表", "正文详情");
     }
 
     function setPanelTitlesXizang() {
-      panel1Title.textContent = "1级板块（西藏官网 · 通知/政策/简章）";
-      panel2Title.textContent = "2级板块（西藏官网 · 列表）";
-      panel3Title.textContent = "3级板块（西藏官网 · 正文抓取）";
+      applyPanelTitles("西藏", "通知政策与招生简章", "资讯列表", "正文详情");
     }
 
     function setStatus(text) {
@@ -1237,7 +1162,7 @@
       if (seq !== uiLoadSeq || selectedProvinceId !== expectedPid) return;
       if (!sections.length) {
         level1Box.innerHTML =
-          '<div class="meta">该省份暂无栏目数据。可先点「全量爬取」或「刷新当前省份」触发爬取，完成后刷新本页。</div>';
+          '<div class="meta">该省份暂无栏目数据。可先点「爬虫加载」触发爬取，完成后刷新本页。</div>';
         appendScoreQueryEntry();
         level2Box.innerHTML = "";
         level3Meta.textContent = "等待爬取完成后即可浏览栏目与文章";
@@ -2871,20 +2796,13 @@
       }
     }
 
-    async function refreshProvince() {
-      setStatus("触发刷新任务...");
-      try {
-        const payload = await jpost("/api/crawl/trigger", {
-          type: "province",
-          province_id: selectedProvinceId,
-        });
-        setStatus(`刷新任务已触发 job_id=${payload.id}，加载报告中…`);
-        await showLatestReportDialog(payload.id);
-      } catch (err) {
-        const msg = err && err.message ? err.message : String(err);
-        setStatus("刷新失败");
-        openReportDialog("刷新失败", msg + "\n\n请确认服务已启动。");
-      }
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
     }
 
     async function copyChatPlainText(plain, btn) {
@@ -2897,7 +2815,7 @@
         setTimeout(() => {
           btn.textContent = prev;
         }, 1600);
-      } catch (e) {
+      } catch (_) {
         alert("复制失败，请手动选中气泡内文字复制。");
       }
     }
@@ -2930,7 +2848,7 @@
       chatHistory = [];
       chatLog.innerHTML = "";
       chatMeta.textContent =
-        "对话已清空。需在环境变量中配置 OPENAI_API_KEY 或 DEEPSEEK_API_KEY。";
+        "对话已清空。可直接对话，或点击第三板块的 AI总结。";
     }
 
     async function sendChatMessage() {
@@ -2944,7 +2862,7 @@
       try {
         const payload = await jpostChat({ messages: toSend });
         if (!payload.ok) {
-          chatLog.removeChild(chatLog.lastChild);
+          if (chatLog.lastChild) chatLog.removeChild(chatLog.lastChild);
           chatMeta.textContent = payload.error || "调用失败";
           alert(payload.error || "调用失败");
           return;
@@ -2953,28 +2871,13 @@
         chatHistory.push({ role: "assistant", content: payload.reply });
         appendChatBubble("assistant", payload.reply);
         const rounds = Math.floor(chatHistory.length / 2);
-        chatMeta.textContent = `已进行 ${rounds} 轮对话（与省份选择无关）`;
+        chatMeta.textContent = `已进行 ${rounds} 轮对话`;
       } catch (err) {
         if (chatLog.lastChild) chatLog.removeChild(chatLog.lastChild);
         chatMeta.textContent = "请求失败";
-        const msg = err.message || String(err);
-        alert(
-          msg +
-            (msg.indexOf("404") !== -1
-              ? "\n\n若持续 404：请在本机停止旧 uvicorn 后重新执行：python -m uvicorn app.main:app --host 127.0.0.1 --port 8001"
-              : "")
-        );
+        alert(err.message || String(err));
       }
       setStatus("就绪");
-    }
-
-    function escapeHtml(str) {
-      return String(str)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#39;");
     }
 
     function extractLevel3Title() {
@@ -3045,7 +2948,7 @@
           content: text,
           title: title || undefined,
         });
-        chatLog.removeChild(loadingWrap);
+        if (loadingWrap.parentNode) chatLog.removeChild(loadingWrap);
         if (!payload.ok) {
           if (chatLog.lastChild) chatLog.removeChild(chatLog.lastChild);
           chatMeta.textContent = payload.error || "政策整理失败";
@@ -3053,19 +2956,12 @@
           return;
         }
         appendPolicySummaryAssistant(payload.reply);
-        chatMeta.textContent =
-          "政策整理已显示在下方；多轮对话历史未写入正文全文，可继续普通对话。";
+        chatMeta.textContent = "政策整理已生成，可逐条点击“复制”。";
       } catch (err) {
         if (loadingWrap.parentNode) chatLog.removeChild(loadingWrap);
         if (chatLog.lastChild) chatLog.removeChild(chatLog.lastChild);
         chatMeta.textContent = "政策整理请求失败";
-        const msg = err.message || String(err);
-        alert(
-          msg +
-            (msg.indexOf("404") !== -1
-              ? "\n\n请确认服务已重启并包含接口 /api/test/summarize-policy"
-              : "")
-        );
+        alert(err.message || String(err));
       } finally {
         if (btn) btn.disabled = false;
         setStatus("就绪");
@@ -3077,11 +2973,9 @@
       const opt = provinceSelect.options[provinceSelect.selectedIndex];
       selectedProvinceName = opt ? opt.textContent : "";
       await loadLevelData();
-      chatMeta.textContent =
-        `当前省份: ${selectedProvinceName}（id=${selectedProvinceId}）· 右侧 AI 对话与省份无关`;
+      chatMeta.textContent = `当前省份: ${selectedProvinceName}（对话功能不受省份影响）`;
     };
 
-    document.getElementById("refreshProvinceBtn").onclick = refreshProvince;
     document.getElementById("preloadCrawlerBtn").onclick = preloadAllProvincesL12;
     document.getElementById("weeklyCrawlerInfoBtn").onclick = loadWeeklyCrawlerInfo;
 
@@ -3130,13 +3024,11 @@
         sendChatMessage();
       }
     });
-
     async function init() {
       try {
         await loadProvinces();
         await loadLevelData();
-        chatMeta.textContent =
-          `当前省份: ${selectedProvinceName}（id=${selectedProvinceId}）· 右侧 AI 对话与省份无关`;
+        chatMeta.textContent = `当前省份: ${selectedProvinceName}（对话功能不受省份影响）`;
         // 页面进入后静默预热，不打断用户当前操作
         preloadAllProvincesL12({ silent: true });
       } catch (err) {
@@ -3149,5 +3041,3 @@
   </script>
 </body>
 </html>
-
-

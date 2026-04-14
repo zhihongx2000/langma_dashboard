@@ -1,4 +1,4 @@
-from bs4 import BeautifulSoup
+﻿from bs4 import BeautifulSoup
 from fastapi.testclient import TestClient
 
 from app.main import app
@@ -7,7 +7,7 @@ from app.services.xizang_levels import LEVEL1_SPEC
 
 def test_xizang_level1_spec_order():
     names = [n for n, _ in LEVEL1_SPEC]
-    assert names == ["通知公告", "政策法规", "招生简章"]
+    assert names == ["閫氱煡鍏憡", "鏀跨瓥娉曡", "鎷涚敓绠€绔?]
 
 
 def test_xizang_parse_sample_html():
@@ -15,15 +15,15 @@ def test_xizang_parse_sample_html():
     <div class="middle">
     <div class="title-tzgg"><a href="/92/138/index.html">a</a></div>
     <ul>
-      <li><a href="/92/138/1.html">公告一</a><span class="date">2026-01-01</span></li>
+      <li><a href="/92/138/1.html">鍏憡涓€</a><span class="date">2026-01-01</span></li>
     </ul>
     <div class="title-zcfg"></div>
     <ul>
-      <li><a href="/92/139/2.html">政策一</a><span class="date">2026-02-01</span></li>
+      <li><a href="/92/139/2.html">鏀跨瓥涓€</a><span class="date">2026-02-01</span></li>
     </ul>
     <div class="title-zsjz"></div>
     <ul>
-      <li><a href="/92/140/3.html">简章一</a><span class="date">2026-03-01</span></li>
+      <li><a href="/92/140/3.html">绠€绔犱竴</a><span class="date">2026-03-01</span></li>
     </ul>
     </div>
     </body></html>"""
@@ -41,11 +41,11 @@ def test_xizang_parse_sample_html():
         items = _collect_list_links(ul, base_url=base)
         level1.append({"name": display_name, "items": items})
 
-    assert level1[0]["name"] == "通知公告"
-    assert level1[0]["items"][0]["title"] == "公告一"
+    assert level1[0]["name"] == "閫氱煡鍏憡"
+    assert level1[0]["items"][0]["title"] == "鍏憡涓€"
     assert level1[0]["items"][0]["url"].endswith("/92/138/1.html")
-    assert level1[1]["items"][0]["title"] == "政策一"
-    assert level1[2]["items"][0]["title"] == "简章一"
+    assert level1[1]["items"][0]["title"] == "鏀跨瓥涓€"
+    assert level1[2]["items"][0]["title"] == "绠€绔犱竴"
 
 
 def test_xizang_levels_endpoint(monkeypatch):
@@ -53,13 +53,13 @@ def test_xizang_levels_endpoint(monkeypatch):
         return {
             "source_url": "http://zsks.edu.xizang.gov.cn/92/index.html",
             "level1": [
-                {"name": "通知公告", "items": [{"title": "t", "url": "http://zsks.edu.xizang.gov.cn/x.html", "publish_date": ""}]},
-                {"name": "政策法规", "items": []},
-                {"name": "招生简章", "items": []},
+                {"name": "閫氱煡鍏憡", "items": [{"title": "t", "url": "http://zsks.edu.xizang.gov.cn/x.html", "publish_date": ""}]},
+                {"name": "鏀跨瓥娉曡", "items": []},
+                {"name": "鎷涚敓绠€绔?, "items": []},
             ],
         }
 
-    monkeypatch.setattr("app.routers.test_local.get_xizang_levels", fake_levels)
+    monkeypatch.setattr("app.routers.crawler_ui.get_xizang_levels", fake_levels)
 
     with TestClient(app) as client:
         r = client.get("/api/test/xizang/levels")
@@ -67,11 +67,11 @@ def test_xizang_levels_endpoint(monkeypatch):
     assert r.status_code == 200
     payload = r.json()
     assert len(payload["level1"]) == 3
-    assert payload["level1"][0]["name"] == "通知公告"
+    assert payload["level1"][0]["name"] == "閫氱煡鍏憡"
 
 
 def test_get_level3_accepts_xizang_netloc(monkeypatch):
-    """正文抓取校验应允许西藏等省域名（与四川列表内 sceea 限制分离）。"""
+    """姝ｆ枃鎶撳彇鏍￠獙搴斿厑璁歌タ钘忕瓑鐪佸煙鍚嶏紙涓庡洓宸濆垪琛ㄥ唴 sceea 闄愬埗鍒嗙锛夈€?""
     from app.services.fetcher import FetchResult
     from app.services.sichuan_levels import get_level3_content
 
@@ -79,13 +79,14 @@ def test_get_level3_accepts_xizang_netloc(monkeypatch):
         "app.services.sichuan_levels.fetch_html",
         lambda url, timeout_sec=25, prefer_browser=False: FetchResult(
             url=url,
-            html="<html><head><title>测</title></head><body><p>正文</p></body></html>",
+            html="<html><head><title>娴?/title></head><body><p>姝ｆ枃</p></body></html>",
             source="mock",
         ),
     )
     monkeypatch.setattr("app.services.sichuan_levels.normalize_html", lambda h: h)
-    monkeypatch.setattr("app.services.sichuan_levels.extract_main_text", lambda html, url=None: "正文")
+    monkeypatch.setattr("app.services.sichuan_levels.extract_main_text", lambda html, url=None: "姝ｆ枃")
 
     out = get_level3_content("http://zsks.edu.xizang.gov.cn/92/138/1.html")
     assert out["ok"] is True
     assert "zsks.edu.xizang.gov.cn" in out["url"]
+

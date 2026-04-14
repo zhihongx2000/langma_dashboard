@@ -1,4 +1,4 @@
-from bs4 import BeautifulSoup
+﻿from bs4 import BeautifulSoup
 from fastapi.testclient import TestClient
 
 from app.main import app
@@ -7,7 +7,7 @@ from app.services.guizhou_levels import LEVEL1_SECTIONS, _date_from_article_url,
 
 def test_guizhou_section_names():
     names = [n for n, _ in LEVEL1_SECTIONS]
-    assert names == ["考试报名", "专业计划", "通知公告"]
+    assert names == ["鑰冭瘯鎶ュ悕", "涓撲笟璁″垝", "閫氱煡鍏憡"]
 
 
 def test_safe_guizhou_article_url():
@@ -29,7 +29,7 @@ def test_date_from_article_url():
 
 def test_parse_guizhou_list():
     html = """<html><body><ul>
-    <li><a href="/zxks/ksbm/202604/t20260407_89968270.html">贵州省2026年上半年高等教育自学考试考前提示</a></li>
+    <li><a href="/zxks/ksbm/202604/t20260407_89968270.html">璐靛窞鐪?026骞翠笂鍗婂勾楂樼瓑鏁欒偛鑷鑰冭瘯鑰冨墠鎻愮ず</a></li>
     </ul></body></html>"""
     soup = BeautifulSoup(html, "lxml")
     rows = _parse_guizhou_list(soup, base_url="http://zsksy.guizhou.gov.cn/zxks/ksbm/")
@@ -44,8 +44,9 @@ def test_guizhou_levels_endpoint(monkeypatch):
             "level1": [{"name": n, "items": []} for n, _ in LEVEL1_SECTIONS],
         }
 
-    monkeypatch.setattr("app.routers.test_local.get_guizhou_levels", fake)
+    monkeypatch.setattr("app.routers.crawler_ui.get_guizhou_levels", fake)
     with TestClient(app) as client:
         r = client.get("/api/test/guizhou/levels")
     assert r.status_code == 200
     assert len(r.json()["level1"]) == 3
+

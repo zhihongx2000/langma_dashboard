@@ -38,10 +38,11 @@ def test_shanghai_levels_endpoint(monkeypatch):
             "level1": [{"name": n, "items": []} for n, _ in LEVEL1_SECTIONS],
         }
 
-    monkeypatch.setattr("app.routers.test_local.get_shanghai_levels", fake)
+    monkeypatch.setattr("app.routers.crawler_ui.get_shanghai_levels", fake)
     with TestClient(app) as client:
         r = client.get("/api/test/shmeea/levels")
         r2 = client.get("/api/test/shanghai/levels")
     assert r.status_code == 200
     assert r2.status_code == 200
     assert len(r.json()["level1"]) == 4
+

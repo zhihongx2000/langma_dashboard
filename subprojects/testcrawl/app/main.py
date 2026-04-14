@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import Depends, FastAPI
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
@@ -16,7 +16,7 @@ from app.routers.crawl import router as crawl_router
 from app.routers.debug import router as debug_router
 from app.routers.provinces import router as provinces_router
 from app.routers.sections import router as sections_router
-from app.routers.test_local import router as test_local_router
+from app.routers.crawler_ui import router as crawler_ui_router
 from app.routers.updates import router as updates_router
 from app.services.seed_loader import make_code, parse_seed_file
 from app.services.scheduler import start_scheduler, stop_scheduler
@@ -156,14 +156,13 @@ def health(db: Session = Depends(get_db)):
 
 @app.get("/")
 def home():
-    ui_path = Path(__file__).resolve().parent.parent / "ui" / "index.html"
+    ui_path = Path(__file__).resolve().parent.parent / "web" / "index.html"
     return FileResponse(ui_path)
 
 
-@app.get("/test-ui")
+@app.get("/test-ui", include_in_schema=False)
 def test_ui():
-    ui_path = Path(__file__).resolve().parent.parent / "ui" / "test_ui.html"
-    return FileResponse(ui_path)
+    return RedirectResponse(url="/", status_code=307)
 
 
 app.include_router(provinces_router)
@@ -172,4 +171,4 @@ app.include_router(contents_router)
 app.include_router(crawl_router)
 app.include_router(updates_router)
 app.include_router(debug_router)
-app.include_router(test_local_router)
+app.include_router(crawler_ui_router)

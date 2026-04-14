@@ -5,8 +5,6 @@ Param(
 $ErrorActionPreference = "Stop"
 Set-Location -Path (Split-Path -Parent $PSScriptRoot)
 
-Write-Warning "run_local_test.ps1 is deprecated. Prefer .\\scripts\\run_local_tool.ps1 for the formal tool entry."
-
 function Import-DotEnvFile {
   param(
     [Parameter(Mandatory = $true)][string]$Path,
@@ -20,15 +18,16 @@ function Import-DotEnvFile {
     $name = $parts[0].Trim()
     $value = $parts[1]
     if ([string]::IsNullOrWhiteSpace($name)) { return }
+    # 空值不写入进程环境，避免把根目录 .env 的有效值覆盖掉
     if ([string]::IsNullOrWhiteSpace($value)) { return }
     if (!$Overwrite -and [Environment]::GetEnvironmentVariable($name, "Process")) { return }
     [Environment]::SetEnvironmentVariable($name, $value, "Process")
   }
 }
 
-if (!(Test-Path ".env.localtest")) {
-  Copy-Item ".env.localtest.example" ".env.localtest"
-  Write-Host "Created .env.localtest from template. Please fill API keys if needed."
+if (!(Test-Path ".env")) {
+  Copy-Item ".env.example" ".env"
+  Write-Host "Created .env from template. Fill API keys if needed."
 }
 
 if ($InstallDeps) {
@@ -36,7 +35,9 @@ if ($InstallDeps) {
   python -m playwright install chromium
 }
 
-Import-DotEnvFile -Path ".env.localtest"
+# 先读 testcrawl/.env（仅注入非空变量）
+Import-DotEnvFile -Path ".env"
+# 再读仓库根目录 .env（同样仅注入非空变量，并允许覆盖）
 $repoRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..\..\.."))
 $repoRootEnv = if ($repoRoot) { Join-Path $repoRoot ".env" } else { $null }
 if ($repoRootEnv) {
@@ -47,5 +48,5 @@ if (-not $env:APP_PORT) {
   $env:APP_PORT = "8001"
 }
 
-Write-Host "Starting internal test server on 0.0.0.0:$($env:APP_PORT)"
+Write-Host "Starting testcrawl tool server on 0.0.0.0:$($env:APP_PORT) (LAN: http://<本机IP>:$($env:APP_PORT)/)"
 python -m uvicorn app.main:app --host 0.0.0.0 --port $env:APP_PORT --reload

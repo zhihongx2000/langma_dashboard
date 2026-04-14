@@ -5,3 +5,6 @@ __pycache__/
 .pytest_cache/
 .venv/
 venv/
+*.log
+data/testcrawl.db
+data/testcrawl_localtest.db

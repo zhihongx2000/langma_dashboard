@@ -21,7 +21,7 @@ def test_sichuan_levels_endpoint(monkeypatch):
             ],
         }
 
-    monkeypatch.setattr("app.routers.test_local.get_sichuan_levels", fake_levels)
+    monkeypatch.setattr("app.routers.crawler_ui.get_sichuan_levels", fake_levels)
 
     with TestClient(app) as client:
         response = client.get("/api/test/sichuan/levels")
@@ -42,7 +42,7 @@ def test_sichuan_content_endpoint(monkeypatch):
             "content_preview": "正文内容",
         }
 
-    monkeypatch.setattr("app.routers.test_local.get_level3_content", fake_content)
+    monkeypatch.setattr("app.routers.crawler_ui.get_level3_content", fake_content)
 
     with TestClient(app) as client:
         response = client.get("/api/test/sichuan/content", params={"url": "https://www.sceea.cn/a.html"})
@@ -55,7 +55,7 @@ def test_sichuan_content_endpoint(monkeypatch):
 
 def test_score_query_endpoint(monkeypatch):
     monkeypatch.setattr(
-        "app.routers.test_local.get_score_query_url",
+        "app.routers.crawler_ui.get_score_query_url",
         lambda province_name, portal_url=None: "https://cx.sceea.cn/html/SZCJ.htm",
     )
 
@@ -86,7 +86,7 @@ def test_sichuan_assistant_endpoint(monkeypatch):
             ],
         }
 
-    monkeypatch.setattr("app.routers.test_local.answer_from_crawled_content", fake_answer)
+    monkeypatch.setattr("app.routers.crawler_ui.answer_from_crawled_content", fake_answer)
 
     with TestClient(app) as client:
         response = client.post("/api/test/sichuan/assistant", json={"question": "请总结自考政策"})
@@ -96,3 +96,4 @@ def test_sichuan_assistant_endpoint(monkeypatch):
     assert payload["ok"] is True
     assert payload["answer"].startswith("回答:")
     assert payload["related_items"][0]["url"] == "https://www.sceea.cn/b.html"
+

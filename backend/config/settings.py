@@ -94,12 +94,19 @@ class EnvironmentSettings(BaseSettings):
     openai_api_key: str | None = Field(
         default=None,
         validation_alias=AliasChoices(
-            "LANG_MA_OPENAI_API_KEY", "OPENAI_API_KEY", "DEEPSEEK_API_KEY"),
+            "LANG_MA_OPENAI_API_KEY", "DEEPSEEK_API_KEY", "OPENAI_API_KEY"),
     )
     openai_base_url: str | None = Field(
         default=None,
         validation_alias=AliasChoices(
-            "LANG_MA_OPENAI_BASE_URL", "OPENAI_BASE_URL", "DEEPSEEK_API_BASE_URL"),
+            "LANG_MA_OPENAI_BASE_URL", "DEEPSEEK_API_BASE_URL", "OPENAI_BASE_URL"),
+    )
+    education_exam_crawler_base_url: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices(
+            "LANG_MA_EDUCATION_EXAM_CRAWLER_BASE_URL",
+            "EDUCATION_EXAM_CRAWLER_BASE_URL",
+        ),
     )
 
 
@@ -111,6 +118,7 @@ class Settings(BaseModel):
     persona_analysis: PersonaAnalysisConfig
     openai_api_key: str | None = None
     openai_base_url: str | None = None
+    education_exam_crawler_base_url: str | None = None
 
     def resolve_path(self, relative_path: str) -> Path:
         path = Path(relative_path)
@@ -159,6 +167,7 @@ def get_settings() -> Settings:
         persona_analysis=yaml_settings.persona_analysis,
         openai_api_key=env_settings.openai_api_key,
         openai_base_url=env_settings.openai_base_url,
+        education_exam_crawler_base_url=env_settings.education_exam_crawler_base_url,
     )
 
 

@@ -1,4 +1,35 @@
-./venv/
-
+# Environment files
 .env
+.env.*
+!.env.example
+!frontend/.env.example
+!subprojects/testcrawl/.env.example
+!subprojects/testcrawl/.env.localtest.example
 
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Node
+node_modules/
+frontend/node_modules/
+dist/
+build/
+coverage/
+
+# Logs
+*.log
+
+# Local databases and runtime data
+*.db
+*.db-journal
+data/*.db
+data/*.sqlite
+subprojects/testcrawl/data/*.db
+
+# OS / editor
+.DS_Store
+Thumbs.db

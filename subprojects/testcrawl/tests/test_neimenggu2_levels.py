@@ -1,4 +1,4 @@
-from fastapi.testclient import TestClient
+﻿from fastapi.testclient import TestClient
 
 from app.main import app
 from app.services.neimenggu2_levels import LEVEL1_SECTIONS, NEIMENGGU2_ENTRY
@@ -10,7 +10,7 @@ def test_neimenggu2_entry_url():
 
 def test_neimenggu2_section_names():
     names = [n for n, _ in LEVEL1_SECTIONS]
-    assert names == ["自考公告", "政策规定", "主考学校公告栏"]
+    assert names == ["鑷€冨叕鍛?, "鏀跨瓥瑙勫畾", "涓昏€冨鏍″叕鍛婃爮"]
 
 
 def test_neimenggu2_list_urls():
@@ -27,9 +27,10 @@ def test_neimenggu2_levels_endpoint(monkeypatch):
             "level1": [{"name": n, "items": []} for n, _ in LEVEL1_SECTIONS],
         }
 
-    monkeypatch.setattr("app.routers.test_local.get_neimenggu2_levels", fake)
+    monkeypatch.setattr("app.routers.crawler_ui.get_neimenggu2_levels", fake)
     with TestClient(app) as client:
         r = client.get("/api/test/neimenggu2/levels")
     assert r.status_code == 200
     assert len(r.json()["level1"]) == 3
+
 

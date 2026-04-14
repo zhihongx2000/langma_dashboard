@@ -1,4 +1,4 @@
-from bs4 import BeautifulSoup
+﻿from bs4 import BeautifulSoup
 from fastapi.testclient import TestClient
 
 from app.main import app
@@ -7,7 +7,7 @@ from app.services.liaoning2_levels import LEVEL1_SECTIONS, _parse_liaoning2_list
 
 def test_liaoning2_section_names():
     names = [n for n, _ in LEVEL1_SECTIONS]
-    assert names == ["温馨提示", "政策规定", "考生须知"]
+    assert names == ["娓╅Θ鎻愮ず", "鏀跨瓥瑙勫畾", "鑰冪敓椤荤煡"]
 
 
 def test_safe_liaoning2_url():
@@ -18,8 +18,8 @@ def test_safe_liaoning2_url():
 
 def test_parse_liaoning2_list():
     html = """<html><body><ul>
-    <li><a href="/lnzk.wb/content/345">辽宁省2026年上半年高等教育自学考试准考证打印温馨提示</a><span>2026-04-03</span></li>
-    <li><a href="/lnzk.wb/catalog/2">更多</a></li>
+    <li><a href="/lnzk.wb/content/345">杈藉畞鐪?026骞翠笂鍗婂勾楂樼瓑鏁欒偛鑷鑰冭瘯鍑嗚€冭瘉鎵撳嵃娓╅Θ鎻愮ず</a><span>2026-04-03</span></li>
+    <li><a href="/lnzk.wb/catalog/2">鏇村</a></li>
     </ul></body></html>"""
     soup = BeautifulSoup(html, "lxml")
     rows = _parse_liaoning2_list(soup, base_url="https://zk.lnzsks.com/lnzk.wb/catalog/2")
@@ -32,15 +32,16 @@ def test_liaoning2_levels_endpoint(monkeypatch):
         return {
             "source_url": "https://zk.lnzsks.com/lnzk.wb/",
             "level1": [
-                {"name": "温馨提示", "items": []},
-                {"name": "政策规定", "items": []},
-                {"name": "考生须知", "items": []},
+                {"name": "娓╅Θ鎻愮ず", "items": []},
+                {"name": "鏀跨瓥瑙勫畾", "items": []},
+                {"name": "鑰冪敓椤荤煡", "items": []},
             ],
         }
 
-    monkeypatch.setattr("app.routers.test_local.get_liaoning2_levels", fake)
+    monkeypatch.setattr("app.routers.crawler_ui.get_liaoning2_levels", fake)
     with TestClient(app) as client:
         r = client.get("/api/test/liaoning2/levels")
     assert r.status_code == 200
     assert len(r.json()["level1"]) == 3
+
 

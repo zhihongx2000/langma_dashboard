@@ -1,4 +1,4 @@
-from bs4 import BeautifulSoup
+﻿from bs4 import BeautifulSoup
 from fastapi.testclient import TestClient
 
 from app.main import app
@@ -7,7 +7,7 @@ from app.services.liaoning1_levels import LEVEL1_SECTIONS, _parse_liaoning1_list
 
 def test_liaoning1_section_names():
     names = [n for n, _ in LEVEL1_SECTIONS]
-    assert names == ["自学考试"]
+    assert names == ["鑷鑰冭瘯"]
 
 
 def test_safe_liaoning1_url():
@@ -18,8 +18,8 @@ def test_safe_liaoning1_url():
 
 def test_parse_liaoning1_list():
     html = """<html><body><ul>
-    <li><a href="/newsinfo/IMS_20260408_45803_1VQRiYoMGJ.htm">辽宁省2026年上半年高等教育自学考试考前提示</a><span>2026-04-08</span></li>
-    <li><a href="javascript:void(0)">下一页</a></li>
+    <li><a href="/newsinfo/IMS_20260408_45803_1VQRiYoMGJ.htm">杈藉畞鐪?026骞翠笂鍗婂勾楂樼瓑鏁欒偛鑷鑰冭瘯鑰冨墠鎻愮ず</a><span>2026-04-08</span></li>
+    <li><a href="javascript:void(0)">涓嬩竴椤?/a></li>
     </ul></body></html>"""
     soup = BeautifulSoup(html, "lxml")
     rows = _parse_liaoning1_list(soup, base_url="https://www.lnzsks.com/listinfo/zxks_1.html")
@@ -31,12 +31,13 @@ def test_liaoning1_levels_endpoint(monkeypatch):
     def fake():
         return {
             "source_url": "https://www.lnzsks.com/listinfo/zxks_1.html",
-            "level1": [{"name": "自学考试", "items": []}],
+            "level1": [{"name": "鑷鑰冭瘯", "items": []}],
         }
 
-    monkeypatch.setattr("app.routers.test_local.get_liaoning1_levels", fake)
+    monkeypatch.setattr("app.routers.crawler_ui.get_liaoning1_levels", fake)
     with TestClient(app) as client:
         r = client.get("/api/test/liaoning1/levels")
     assert r.status_code == 200
     assert len(r.json()["level1"]) == 1
+
 

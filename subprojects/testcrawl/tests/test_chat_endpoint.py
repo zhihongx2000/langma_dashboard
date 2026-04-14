@@ -1,4 +1,4 @@
-from fastapi.testclient import TestClient
+﻿from fastapi.testclient import TestClient
 
 from app.main import app
 
@@ -6,9 +6,9 @@ from app.main import app
 def test_chat_endpoint_ok(monkeypatch):
     def fake_chat(messages, *, max_rounds=20):
         assert messages[-1]["role"] == "user"
-        return {"ok": True, "error": None, "reply": "你好"}
+        return {"ok": True, "error": None, "reply": "浣犲ソ"}
 
-    monkeypatch.setattr("app.routers.test_local.chat_completion", fake_chat)
+    monkeypatch.setattr("app.routers.crawler_ui.chat_completion", fake_chat)
     with TestClient(app) as client:
         r = client.post(
             "/api/test/chat",
@@ -16,7 +16,7 @@ def test_chat_endpoint_ok(monkeypatch):
         )
     assert r.status_code == 200
     assert r.json()["ok"] is True
-    assert r.json()["reply"] == "你好"
+    assert r.json()["reply"] == "浣犲ソ"
 
 
 def test_chat_rejects_bad_role():
@@ -32,7 +32,7 @@ def test_chat_alias_path_ok(monkeypatch):
     def fake_chat(messages, *, max_rounds=20):
         return {"ok": True, "error": None, "reply": "pong"}
 
-    monkeypatch.setattr("app.routers.test_local.chat_completion", fake_chat)
+    monkeypatch.setattr("app.routers.crawler_ui.chat_completion", fake_chat)
     with TestClient(app) as client:
         r = client.post(
             "/api/test/ai/chat",
@@ -45,16 +45,17 @@ def test_chat_alias_path_ok(monkeypatch):
 def test_summarize_policy_endpoint_ok(monkeypatch):
     def fake_summarize(*, content, title=None, max_chars=28000):
         assert len(content) >= 10
-        assert "官方" in content or "通知" in content
-        return {"ok": True, "error": None, "reply": "- **截止**：示例\n- 注意：以官网为准"}
+        assert "notice" in content or "official" in content
+        return {"ok": True, "error": None, "reply": "- deadline: example\n- note: use official source"}
 
-    monkeypatch.setattr("app.routers.test_local.summarize_policy_document", fake_summarize)
+    monkeypatch.setattr("app.routers.crawler_ui.summarize_policy_document", fake_summarize)
     with TestClient(app) as client:
         r = client.post(
             "/api/test/summarize-policy",
-            json={"content": "某省考试院通知：自学考试报名时间延长至月底。", "title": "测试标题"},
+            json={"content": "official notice: registration deadline has been extended to month end.", "title": "test title"},
         )
     assert r.status_code == 200
     body = r.json()
     assert body["ok"] is True
-    assert "截止" in body["reply"]
+    assert "deadline" in body["reply"]
+

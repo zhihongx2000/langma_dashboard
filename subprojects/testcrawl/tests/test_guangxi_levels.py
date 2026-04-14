@@ -1,4 +1,4 @@
-from bs4 import BeautifulSoup
+﻿from bs4 import BeautifulSoup
 from fastapi.testclient import TestClient
 
 from app.main import app
@@ -7,7 +7,7 @@ from app.services.guangxi_levels import LEVEL1_SECTIONS, _extract_date_like, _pa
 
 def test_guangxi_section_names():
     names = [n for n, _ in LEVEL1_SECTIONS]
-    assert names == ["通知公告", "招生问答", "招考日程"]
+    assert names == ["閫氱煡鍏憡", "鎷涚敓闂瓟", "鎷涜€冩棩绋?]
 
 
 def test_safe_guangxi_article_url():
@@ -17,12 +17,12 @@ def test_safe_guangxi_article_url():
 
 
 def test_extract_date_like_guangxi():
-    assert _extract_date_like("2026年3月1日发布公告") == "2026-03-01"
+    assert _extract_date_like("2026骞?鏈?鏃ュ彂甯冨叕鍛?) == "2026-03-01"
 
 
 def test_parse_guangxi_list():
     html = """<html><body><ul>
-    <li><a href="../view/content_1148_32484.htm">广西自学考试通知</a></li>
+    <li><a href="../view/content_1148_32484.htm">骞胯タ鑷鑰冭瘯閫氱煡</a></li>
     </ul></body></html>"""
     soup = BeautifulSoup(html, "lxml")
     rows = _parse_guangxi_list(soup, base_url="https://www.gxeea.cn/zxks/tzgg.htm")
@@ -37,8 +37,9 @@ def test_guangxi_levels_endpoint(monkeypatch):
             "level1": [{"name": n, "items": []} for n, _ in LEVEL1_SECTIONS],
         }
 
-    monkeypatch.setattr("app.routers.test_local.get_guangxi_levels", fake)
+    monkeypatch.setattr("app.routers.crawler_ui.get_guangxi_levels", fake)
     with TestClient(app) as client:
         r = client.get("/api/test/guangxi/levels")
     assert r.status_code == 200
     assert len(r.json()["level1"]) == 3
+

@@ -1,4 +1,4 @@
-from bs4 import BeautifulSoup
+﻿from bs4 import BeautifulSoup
 from fastapi.testclient import TestClient
 
 from app.main import app
@@ -13,7 +13,7 @@ from app.services.guangdong2_levels import (
 
 def test_guangdong2_section_names():
     names = [n for n, _ in LEVEL1_SECTIONS]
-    assert names == ["专业计划", "助学管理", "考务管理", "考籍管理", "其他公告"]
+    assert names == ["涓撲笟璁″垝", "鍔╁绠＄悊", "鑰冨姟绠＄悊", "鑰冪睄绠＄悊", "鍏朵粬鍏憡"]
 
 
 def test_safe_gd2_detail_url():
@@ -27,7 +27,7 @@ def test_parse_notice_list():
     <ul class="news-list">
       <li class="news-item">
         <a href="notice-detail.html?ggxh=227">
-          <span>2026年专业调整相关文件及资料</span>
+          <span>2026骞翠笓涓氳皟鏁寸浉鍏虫枃浠跺強璧勬枡</span>
           <span class="news-date">2025-11-25</span>
         </a>
       </li>
@@ -44,7 +44,7 @@ def test_rows_from_notice_payload():
     payload = {
         "data": {
             "notices": [
-                {"ggxh": 231, "bt": "关于公布2026年4、10月广东省高等教育自学考试开考课程考试时间安排和使用教材的通知", "gxsj": "2025-12-23"}
+                {"ggxh": 231, "bt": "鍏充簬鍏竷2026骞?銆?0鏈堝箍涓滅渷楂樼瓑鏁欒偛鑷鑰冭瘯寮€鑰冭绋嬭€冭瘯鏃堕棿瀹夋帓鍜屼娇鐢ㄦ暀鏉愮殑閫氱煡", "gxsj": "2025-12-23"}
             ]
         },
         "success": True,
@@ -66,8 +66,9 @@ def test_guangdong2_levels_endpoint(monkeypatch):
             "level1": [{"name": n, "items": []} for n, _ in LEVEL1_SECTIONS],
         }
 
-    monkeypatch.setattr("app.routers.test_local.get_guangdong2_levels", fake)
+    monkeypatch.setattr("app.routers.crawler_ui.get_guangdong2_levels", fake)
     with TestClient(app) as client:
         r = client.get("/api/test/guangdong2/levels")
     assert r.status_code == 200
     assert len(r.json()["level1"]) == 5
+

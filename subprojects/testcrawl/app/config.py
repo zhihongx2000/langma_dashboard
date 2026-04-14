@@ -1,16 +1,31 @@
 from functools import lru_cache
+from pathlib import Path
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# 与仓库根目录共用一份 .env（README 要求在根目录配置 DEEPSEEK_API_KEY 等），避免仅读了 testcrawl/.env 而漏掉密钥
+_APP_DIR = Path(__file__).resolve().parent
+_TESTCRAWL_ROOT = _APP_DIR.parent
+_REPO_ROOT = _APP_DIR.parents[3]
+_ENV_FILES = (
+    str(_TESTCRAWL_ROOT / ".env"),
+    str(_REPO_ROOT / ".env"),
+)
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+    model_config = SettingsConfigDict(
+        env_file=_ENV_FILES,
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
 
     app_name: str = "Exam Crawler API"
     app_env: str = "dev"
     app_host: str = "0.0.0.0"
-    app_port: int = 8000
+    app_port: int = 8001
 
-    database_url: str = "sqlite:///./testcrawl.db"
+    database_url: str = "sqlite:///./data/testcrawl.db"
     admin_api_key: str = "change-this-api-key"
 
     crawl_timeout_sec: int = 20

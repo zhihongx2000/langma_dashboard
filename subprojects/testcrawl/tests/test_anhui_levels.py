@@ -1,4 +1,4 @@
-from bs4 import BeautifulSoup
+﻿from bs4 import BeautifulSoup
 from fastapi.testclient import TestClient
 
 from app.main import app
@@ -7,7 +7,7 @@ from app.services.anhui_levels import LEVEL1_SECTIONS, _parse_anhui_list, _safe_
 
 def test_anhui_section_names():
     names = [n for n, _ in LEVEL1_SECTIONS]
-    assert names == ["自考动态", "考试安排", "教材版本", "主考院校", "政策文件", "助学管理", "业务办理", "本科", "专科"]
+    assert names == ["鑷€冨姩鎬?, "鑰冭瘯瀹夋帓", "鏁欐潗鐗堟湰", "涓昏€冮櫌鏍?, "鏀跨瓥鏂囦欢", "鍔╁绠＄悊", "涓氬姟鍔炵悊", "鏈", "涓撶"]
 
 
 def test_safe_anhui_content_url():
@@ -18,8 +18,8 @@ def test_safe_anhui_content_url():
 
 def test_parse_anhui_list():
     html = """<html><body><ul>
-    <li><a href="/gdjyzxks/8609.htm">安徽省高等教育自学考试2026年4月考试教材版本目录</a><span>2025-12-25</span></li>
-    <li><a href="/gdjyzxks/675.htm">自考指南</a></li>
+    <li><a href="/gdjyzxks/8609.htm">瀹夊窘鐪侀珮绛夋暀鑲茶嚜瀛﹁€冭瘯2026骞?鏈堣€冭瘯鏁欐潗鐗堟湰鐩綍</a><span>2025-12-25</span></li>
+    <li><a href="/gdjyzxks/675.htm">鑷€冩寚鍗?/a></li>
     </ul></body></html>"""
     soup = BeautifulSoup(html, "lxml")
     rows = _parse_anhui_list(soup, base_url="https://www.ahzsks.cn/gdjyzxks/search2.jsp?c=81")
@@ -31,12 +31,13 @@ def test_anhui_levels_endpoint(monkeypatch):
     def fake():
         return {
             "source_url": "https://www.ahzsks.cn/gdjyzxks/",
-            "level1": [{"name": "自考动态", "items": []}],
+            "level1": [{"name": "鑷€冨姩鎬?, "items": []}],
         }
 
-    monkeypatch.setattr("app.routers.test_local.get_anhui_levels", fake)
+    monkeypatch.setattr("app.routers.crawler_ui.get_anhui_levels", fake)
     with TestClient(app) as client:
         r = client.get("/api/test/anhui/levels")
     assert r.status_code == 200
     assert len(r.json()["level1"]) == 1
+
 

@@ -14,7 +14,7 @@ Get-Content ".env.localtest" | ForEach-Object {
   $envMap[$parts[0].Trim()] = $parts[1]
 }
 
-$base = "http://127.0.0.1:8000"
+$base = "http://127.0.0.1:8001"
 $adminKey = "local-test-key"
 if ($envMap.ContainsKey("ADMIN_API_KEY") -and $envMap["ADMIN_API_KEY"]) {
   $adminKey = $envMap["ADMIN_API_KEY"]

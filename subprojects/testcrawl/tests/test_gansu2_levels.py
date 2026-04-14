@@ -1,4 +1,4 @@
-from fastapi.testclient import TestClient
+﻿from fastapi.testclient import TestClient
 
 from app.main import app
 from app.services.gansu2_levels import (
@@ -11,10 +11,10 @@ from app.services.gansu2_levels import (
 
 def test_gansu2_section_names_order():
     names = [t[0] for t in GANSU2_SECTIONS]
-    assert names[0] == "首页"
-    assert "开考专业查询" in names
-    assert "二年级开考课程" in names
-    assert "新旧专业课程顶替关系表（社会型）" in names
+    assert names[0] == "棣栭〉"
+    assert "寮€鑰冧笓涓氭煡璇? in names
+    assert "浜屽勾绾у紑鑰冭绋? in names
+    assert "鏂版棫涓撲笟璇剧▼椤舵浛鍏崇郴琛紙绀句細鍨嬶級" in names
 
 
 def test_section_url_hash():
@@ -22,8 +22,8 @@ def test_section_url_hash():
 
 
 def test_is_table_header_row():
-    assert _is_table_header_row("专业名称 2026-04-11 上午【09:00-11:30】 2026-04-11 下午")
-    assert not _is_table_header_row("510201 计算机应用技术（专科）")
+    assert _is_table_header_row("涓撲笟鍚嶇О 2026-04-11 涓婂崍銆?9:00-11:30銆?2026-04-11 涓嬪崍")
+    assert not _is_table_header_row("510201 璁＄畻鏈哄簲鐢ㄦ妧鏈紙涓撶锛?)
 
 
 def test_gansu2_levels_endpoint(monkeypatch):
@@ -33,10 +33,11 @@ def test_gansu2_levels_endpoint(monkeypatch):
             "level1": [{"name": n, "items": []} for n, _, _, _ in GANSU2_SECTIONS],
         }
 
-    monkeypatch.setattr("app.routers.test_local.get_gansu2_levels", fake)
+    monkeypatch.setattr("app.routers.crawler_ui.get_gansu2_levels", fake)
 
     with TestClient(app) as client:
         r = client.get("/api/test/gansu2/levels")
 
     assert r.status_code == 200
     assert len(r.json()["level1"]) == len(GANSU2_SECTIONS)
+

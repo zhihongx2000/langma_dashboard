@@ -1,4 +1,4 @@
-from bs4 import BeautifulSoup
+﻿from bs4 import BeautifulSoup
 from fastapi.testclient import TestClient
 
 from app.main import app
@@ -7,7 +7,7 @@ from app.services.jiangxi_levels import LEVEL1_SECTIONS, _parse_jiangxi_list, _s
 
 def test_jiangxi_section_names():
     names = [n for n, _ in LEVEL1_SECTIONS]
-    assert names == ["考试动态", "通知公告", "常见问答"]
+    assert names == ["鑰冭瘯鍔ㄦ€?, "閫氱煡鍏憡", "甯歌闂瓟"]
 
 
 def test_safe_jiangxi_content_url():
@@ -19,8 +19,8 @@ def test_safe_jiangxi_content_url():
 
 def test_parse_jiangxi_list():
     html = """<html><body><ul>
-    <li><a href="/jxsjyksy/ksdt73/content/content_2016434039371599872.html">江西省2025年下半年自学考试毕业审核工作顺利结束</a><span>2026-01-28</span></li>
-    <li><a href="/jxsjyksy/ksdt73/list.html">考试动态</a></li>
+    <li><a href="/jxsjyksy/ksdt73/content/content_2016434039371599872.html">姹熻タ鐪?025骞翠笅鍗婂勾鑷鑰冭瘯姣曚笟瀹℃牳宸ヤ綔椤哄埄缁撴潫</a><span>2026-01-28</span></li>
+    <li><a href="/jxsjyksy/ksdt73/list.html">鑰冭瘯鍔ㄦ€?/a></li>
     </ul></body></html>"""
     soup = BeautifulSoup(html, "lxml")
     rows = _parse_jiangxi_list(soup, base_url="http://www.jxeea.cn/jxsjyksy/ksdt73/list.html")
@@ -32,7 +32,7 @@ def test_parse_jiangxi_list_from_script_data():
     html = """<html><body>
     <script>
     var listData = {
-      articleList: [{"title":"江西省2025年下半年自学考试毕业审核工作顺利结束","pubDate":"2026-01-28 16:50","urls":"{\\"pc\\":\\"/jxsjyksy/ksdt73/content/content_2016434039371599872.html\\"}"}],
+      articleList: [{"title":"姹熻タ鐪?025骞翠笅鍗婂勾鑷鑰冭瘯姣曚笟瀹℃牳宸ヤ綔椤哄埄缁撴潫","pubDate":"2026-01-28 16:50","urls":"{\\"pc\\":\\"/jxsjyksy/ksdt73/content/content_2016434039371599872.html\\"}"}],
       columnPageData: []
     }
     </script>
@@ -49,15 +49,16 @@ def test_jiangxi_levels_endpoint(monkeypatch):
         return {
             "source_url": "http://www.jxeea.cn/jxsjyksy/zxks55/list.html",
             "level1": [
-                {"name": "考试动态", "items": []},
-                {"name": "通知公告", "items": []},
-                {"name": "常见问答", "items": []},
+                {"name": "鑰冭瘯鍔ㄦ€?, "items": []},
+                {"name": "閫氱煡鍏憡", "items": []},
+                {"name": "甯歌闂瓟", "items": []},
             ],
         }
 
-    monkeypatch.setattr("app.routers.test_local.get_jiangxi_levels", fake)
+    monkeypatch.setattr("app.routers.crawler_ui.get_jiangxi_levels", fake)
     with TestClient(app) as client:
         r = client.get("/api/test/jiangxi/levels")
     assert r.status_code == 200
     assert len(r.json()["level1"]) == 3
+
 

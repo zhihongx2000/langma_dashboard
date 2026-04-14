@@ -4,7 +4,7 @@ services:
   app:
     build: .
     ports:
-      - "8000:8000"
+      - "8001:8001"
     environment:
       DATABASE_URL: sqlite:////app/data/testcrawl.db
       ADMIN_API_KEY: please-change-me

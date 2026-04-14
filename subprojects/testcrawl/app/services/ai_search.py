@@ -1,11 +1,11 @@
 import json
 import re
 
-from openai import OpenAI
 from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
+from app.llm_openai_client import get_openai_compatible_client
 from app.models.content import Content
 from app.models.section import Section
 
@@ -17,11 +17,11 @@ def search_contents_ai(db: Session, query: str, province_id: int | None = None, 
     base_rows = _candidate_rows(db, query=query, province_id=province_id, limit=settings.ai_search_candidates)
     keyword_items = [_to_item(row) for row in base_rows[:max_limit]]
 
-    if not settings.deepseek_api_key:
+    if get_openai_compatible_client() is None:
         return {
             "query": query,
             "mode": "keyword_only",
-            "reason": "DEEPSEEK_API_KEY is empty",
+            "reason": "no_llm_credentials",
             "items": keyword_items,
         }
 
@@ -66,8 +66,9 @@ def _candidate_rows(db: Session, query: str, province_id: int | None, limit: int
 def _ask_llm_for_ids(query: str, candidates: list[Content], limit: int) -> list[int]:
     if not candidates:
         return []
-    base_url = settings.deepseek_api_base_url.rstrip("/")
-    client = OpenAI(api_key=settings.deepseek_api_key, base_url=base_url)
+    client = get_openai_compatible_client()
+    if client is None:
+        return []
     lines = []
     for row in candidates:
         snippet = (row.content_text or "")[:180].replace("\n", " ").strip()

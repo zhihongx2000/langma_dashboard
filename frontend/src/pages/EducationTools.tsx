@@ -1,8 +1,52 @@
 import { ArrowRight, Brain, Calendar, ChevronRight, Globe, MessageSquare, Network, Tag, UploadCloud, Zap } from 'lucide-react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+/** 后端配置的考试院地址常为 127.0.0.1；手机访问时 127.0.0.1 指向手机自身，需换成当前页所在主机名（如电脑局域网 IP）。 */
+function rewriteLocalhostToolUrl(url: string): string {
+  try {
+    const parsed = new URL(url);
+    if (parsed.hostname !== '127.0.0.1' && parsed.hostname !== 'localhost') {
+      return url;
+    }
+    parsed.hostname = window.location.hostname;
+    return parsed.href;
+  } catch {
+    return url;
+  }
+}
 
 export default function EducationTools() {
   const navigate = useNavigate();
+  const [isLaunchingCrawler, setIsLaunchingCrawler] = useState(false);
+
+  const handleLaunchCrawler = async () => {
+    if (isLaunchingCrawler) return;
+    setIsLaunchingCrawler(true);
+    try {
+      const response = await fetch('/api/v1/tools/education-exam-crawler/status');
+      if (!response.ok) {
+        alert('暂时无法检查考试院信息收集工具状态，请稍后重试。');
+        return;
+      }
+      const payload = await response.json();
+      if (payload.configured && payload.reachable) {
+        const raw = typeof payload.launch_url === 'string' ? payload.launch_url : '';
+        const target = raw ? rewriteLocalhostToolUrl(raw) : '';
+        if (target) {
+          window.location.assign(target);
+          return;
+        }
+        window.location.assign('/api/v1/tools/education-exam-crawler/launch');
+        return;
+      }
+      alert(payload.message || '考试院信息收集工具暂不可用，请检查配置和服务状态。');
+    } catch {
+      alert('检查考试院信息收集工具状态失败，请确认后端服务已启动。');
+    } finally {
+      setIsLaunchingCrawler(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-surface text-on-surface font-body relative overflow-x-hidden selection:bg-primary/20 flex flex-col">
@@ -62,29 +106,22 @@ export default function EducationTools() {
           </div>
 
           {/* Medium Card 1 */}
-          <div className="bg-surface-container-low rounded-2xl p-8 md:p-10 flex flex-col md:flex-row gap-8 items-start group opacity-90 hover:opacity-100 transition-all">
+          <div className="bg-surface-container-lowest rounded-2xl p-8 md:p-10 flex flex-col md:flex-row gap-8 items-start group transition-all duration-300">
             <div className="flex-1">
-              <div className="flex items-center gap-3 mb-4">
-                <span className="inline-flex items-center px-3 py-1 border border-outline-variant text-on-secondary-container rounded-full text-[10px] font-medium uppercase tracking-wider">
-                  规划中
-                </span>
-                <span className="text-xs text-on-surface-variant italic">预计 Q3 季度开启测试</span>
-              </div>
-              <h3 className="text-2xl font-headline font-bold text-on-surface mb-4">考试院信息收集工具</h3>
-              <p className="text-on-secondary-container leading-relaxed max-w-3xl">
+              <h3 className="text-3xl font-headline font-extrabold text-primary mb-4">考试院信息收集工具</h3>
+              <p className="text-on-surface-variant text-lg leading-relaxed max-w-3xl">
                 全网实时抓取各地考试院动态，自动分类整理政策变动、报名时间及考位余额提醒。结合地理位置推送，确保不遗漏任何关键节点。
               </p>
               <button
-                onClick={() => {
-                  window.location.href = "http://127.0.0.1:8000/test-ui";
-                }}
+                onClick={handleLaunchCrawler}
+                disabled={isLaunchingCrawler}
                 className="mt-8 flex items-center gap-2 px-8 py-3.5 bg-primary text-on-primary rounded-xl font-bold text-sm hover:opacity-90 transition-opacity active:scale-95"
               >
-                立即开始分析
+                {isLaunchingCrawler ? '检查服务状态中...' : '立即开始分析'}
                 <ArrowRight size={16} />
               </button>
             </div>
-            <div className="p-4 bg-surface-container-highest/30 rounded-2xl text-on-secondary-container group-hover:text-primary transition-colors">
+            <div className="p-4 bg-surface-container-highest/30 rounded-2xl text-primary transition-colors">
               <Globe size={40} strokeWidth={1.5} />
             </div>
           </div>
